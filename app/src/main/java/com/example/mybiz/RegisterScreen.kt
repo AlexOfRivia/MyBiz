@@ -10,10 +10,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.mybiz.ui.theme.MyBizTheme
 
 @Composable
-fun RegisterScreen()
+fun RegisterScreen(navController: NavController)
 {
     var username by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
@@ -81,6 +83,6 @@ fun RegisterScreen()
 fun RegisterScreenPreview()
 {
     MyBizTheme() {
-        RegisterScreen()
+        RegisterScreen(navController = rememberNavController())
     }
 }

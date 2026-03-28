@@ -10,10 +10,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.mybiz.ui.theme.MyBizTheme
 
 @Composable
-fun LoginScreen()
+fun LoginScreen(navController: NavController)
 {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -68,6 +70,6 @@ fun LoginScreen()
 fun LoginScreenPreview()
 {
     MyBizTheme() {
-        LoginScreen()
+        LoginScreen(navController = rememberNavController())
     }
 }

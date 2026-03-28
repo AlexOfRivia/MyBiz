@@ -8,10 +8,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.mybiz.ui.theme.MyBizTheme
 
 @Composable
-fun MainScreen()
+fun MainScreen(navController: NavController)
 {
 
     Column(
@@ -23,18 +25,18 @@ fun MainScreen()
             text = "MyBiz",
             color = MaterialTheme.colorScheme.primary,
             style = MaterialTheme.typography.headlineLarge,
-            modifier = Modifier.padding(top = 70.dp, bottom = 200.dp)
+            modifier = Modifier.padding(top = 90.dp, bottom = 200.dp)
         )
 
         Button(
-            onClick = { /*przeniesienie na ekran logowania*/ },
+            onClick = { navController.navigate("login_screen") },
             modifier = Modifier.fillMaxWidth().padding(40.dp)
         ) {
             Text("Zaloguj się")
         }
 
         Button(
-            onClick = { /*przeniesienie na ekran główny*/ },
+            onClick = { navController.navigate("register_screen") },
             modifier = Modifier.fillMaxWidth().padding(40.dp)
         ) {
             Text("Zarejestruj się")
@@ -48,6 +50,6 @@ fun MainScreen()
 fun MainScreenPreview()
 {
     MyBizTheme() {
-        MainScreen()
+        MainScreen(navController = rememberNavController())
     }
 }
