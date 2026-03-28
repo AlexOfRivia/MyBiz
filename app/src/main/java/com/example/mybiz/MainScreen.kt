@@ -34,7 +34,7 @@ fun MainScreen()
         }
 
         Button(
-            onClick = { /*przeniesienie na ekran logowania*/ },
+            onClick = { /*przeniesienie na ekran główny*/ },
             modifier = Modifier.fillMaxWidth().padding(40.dp)
         ) {
             Text("Zarejestruj się")
