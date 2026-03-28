@@ -56,7 +56,8 @@ fun LoginScreen(navController: NavController)
 
         Button(
             onClick = {
-                /*przejście do ekranu głównego*/
+                /*przejście do ekranu głównego
+                * w arg następnej funkcji można passować username, hasło, itp itd*/
             },
             modifier = Modifier.width(200.dp).padding(bottom=50.dp, top = 60.dp)
         ) {
