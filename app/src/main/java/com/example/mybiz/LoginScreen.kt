@@ -18,22 +18,24 @@ import com.google.firebase.FirebaseApp.*
 import com.google.firebase.auth.*
 
 @Composable
-fun LoginScreen(navController: NavController)
-{
+fun LoginScreen(navController: NavController) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
     val context = androidx.compose.ui.platform.LocalContext.current
 
     //initializing Firebase
-    var auth = remember { Firebase.auth }
-    auth = Firebase.auth
+    var auth = if(androidx.compose.ui.platform.LocalInspectionMode.current) {
+        null
+    } else {
+        Firebase.auth
+    }
 
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
-    ){
+    ) {
         Text(
             text = "Zaloguj się",
             color = MaterialTheme.colorScheme.primary,
@@ -54,37 +56,47 @@ fun LoginScreen(navController: NavController)
             value = password,
             onValueChange = { password = it },
             label = { Text("Podaj hasło") },
-            modifier = Modifier.padding(bottom = 60.dp),
+            modifier = Modifier.padding(bottom = 20.dp),
             singleLine = true,
             shape = RoundedCornerShape(12.dp)
         )
 
+        //gotta add forgot password here
+        TextButton(
+            onClick = { navController.navigate("password_reset_screen") },
+                modifier = Modifier.padding(bottom = 60.dp)
+                ) {
+                    Text("Resetuj hasło")
+                }
+
         Button(
             onClick = {
-                if(email.isNotEmpty() && password.isNotEmpty())
-                {
-                    auth.signInWithEmailAndPassword(email,password).addOnCompleteListener { task ->
-                        if(task.isSuccessful)
-                        {
-                            navController.navigate("dashboard_screen")
-                        } else {
-                            android.widget.Toast.makeText(context, "Error: ${task.exception?.message}", android.widget.Toast.LENGTH_LONG).show()
+                if (email.isNotEmpty() && password.isNotEmpty()) {
+                    auth?.signInWithEmailAndPassword(email, password)?.addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                navController.navigate("dashboard_screen")
+                            } else {
+                                android.widget.Toast.makeText(
+                                    context,
+                                    "Error: ${task.exception?.message}",
+                                    android.widget.Toast.LENGTH_LONG
+                                ).show()
+                            }
                         }
-                    }
+                } },
+                    modifier = Modifier
+                        .width(200.dp)
+                        .padding(bottom = 50.dp, top = 60.dp)
+                ) {
+                    Text("Dalej")
                 }
-            },
-            modifier = Modifier.width(200.dp).padding(bottom=50.dp, top = 60.dp)
-        ) {
-            Text("Dalej")
+            }
+    }
+
+    @Preview(showBackground = true)
+    @Composable
+    fun LoginScreenPreview() {
+        MyBizTheme(darkTheme = true) {
+            LoginScreen(navController = rememberNavController())
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun LoginScreenPreview()
-{
-    MyBizTheme(darkTheme = true) {
-        LoginScreen(navController = rememberNavController())
-    }
-}

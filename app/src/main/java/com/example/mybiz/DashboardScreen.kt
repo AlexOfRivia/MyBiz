@@ -16,7 +16,7 @@ import com.example.mybiz.ui.theme.MyBizTheme
 @Composable
 fun DashboardScreen(navController: NavController)
 {
-
+    //this dashboard will have charts etc.
 }
 
 @Preview(showBackground = true)

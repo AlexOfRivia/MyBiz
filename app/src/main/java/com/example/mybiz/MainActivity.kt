@@ -45,6 +45,9 @@ class MainActivity : ComponentActivity() {
                         composable("dashboard_screen") {
                             DashboardScreen(navigationController)
                         }
+                        composable("password_reset_screen") {
+                            PasswordResetScreen(navigationController)
+                        }
                     }
                 }
             }
