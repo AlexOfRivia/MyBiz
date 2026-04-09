@@ -11,11 +11,13 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.mybiz.ui.theme.MyBizTheme
+import com.google.firebase.Firebase
+import com.google.firebase.FirebaseApp.*
+import com.google.firebase.auth.*
 
 @Composable
 fun MainScreen(navController: NavController)
 {
-
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -49,7 +51,7 @@ fun MainScreen(navController: NavController)
 @Composable
 fun MainScreenPreview()
 {
-    MyBizTheme() {
+    MyBizTheme(darkTheme = true) {
         MainScreen(navController = rememberNavController())
     }
 }

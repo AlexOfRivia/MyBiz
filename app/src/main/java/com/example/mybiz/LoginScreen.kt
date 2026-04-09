@@ -13,12 +13,21 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.mybiz.ui.theme.MyBizTheme
+import com.google.firebase.Firebase
+import com.google.firebase.FirebaseApp.*
+import com.google.firebase.auth.*
 
 @Composable
 fun LoginScreen(navController: NavController)
 {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+
+    val context = androidx.compose.ui.platform.LocalContext.current
+
+    //initializing Firebase
+    var auth = remember { Firebase.auth }
+    auth = Firebase.auth
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -34,9 +43,7 @@ fun LoginScreen(navController: NavController)
 
         OutlinedTextField(
             value = email,
-            onValueChange = {
-                /*zmiana maila + regex*/
-            },
+            onValueChange = { email = it },
             label = { Text("Podaj email") },
             modifier = Modifier.padding(bottom = 50.dp),
             singleLine = true,
@@ -45,9 +52,7 @@ fun LoginScreen(navController: NavController)
 
         OutlinedTextField(
             value = password,
-            onValueChange = {
-                /*zmiana hasła + regex*/
-            },
+            onValueChange = { password = it },
             label = { Text("Podaj hasło") },
             modifier = Modifier.padding(bottom = 60.dp),
             singleLine = true,
@@ -56,8 +61,17 @@ fun LoginScreen(navController: NavController)
 
         Button(
             onClick = {
-                /*przejście do ekranu głównego
-                * w arg następnej funkcji można passować username, hasło, itp itd*/
+                if(email.isNotEmpty() && password.isNotEmpty())
+                {
+                    auth.signInWithEmailAndPassword(email,password).addOnCompleteListener { task ->
+                        if(task.isSuccessful)
+                        {
+                            navController.navigate("dashboard_screen")
+                        } else {
+                            android.widget.Toast.makeText(context, "Error: ${task.exception?.message}", android.widget.Toast.LENGTH_LONG).show()
+                        }
+                    }
+                }
             },
             modifier = Modifier.width(200.dp).padding(bottom=50.dp, top = 60.dp)
         ) {
@@ -70,7 +84,7 @@ fun LoginScreen(navController: NavController)
 @Composable
 fun LoginScreenPreview()
 {
-    MyBizTheme() {
+    MyBizTheme(darkTheme = true) {
         LoginScreen(navController = rememberNavController())
     }
 }

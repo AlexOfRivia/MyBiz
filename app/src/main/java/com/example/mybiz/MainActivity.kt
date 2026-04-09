@@ -12,6 +12,9 @@ import androidx.navigation.compose.rememberNavController
 import com.example.mybiz.ui.theme.MyBizTheme
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.google.firebase.Firebase
+import com.google.firebase.FirebaseApp.*
+import com.google.firebase.auth.*
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,6 +41,9 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("login_screen") {
                             LoginScreen(navigationController) //passing the navigation controller for managing views
+                        }
+                        composable("dashboard_screen") {
+                            DashboardScreen(navigationController)
                         }
                     }
                 }
