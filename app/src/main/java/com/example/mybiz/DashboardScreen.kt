@@ -6,6 +6,8 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.*
@@ -36,7 +38,7 @@ fun DashboardScreen(navController: NavController)
     var SpendingsList = mutableListOf<Spending>()
 
     var testList = mutableListOf<Double>(1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0)
-    val chartViews = listOf("Wydatki", "Przychody", "Wszystko")
+    var currentChartView by remember { mutableStateOf("Przychody") }
 
     //this dashboard will have charts etc.
     Column(
@@ -46,7 +48,7 @@ fun DashboardScreen(navController: NavController)
     ){
 
         Row(
-            modifier = Modifier.fillMaxWidth().padding(bottom = 50.dp),
+            modifier = Modifier.fillMaxWidth().padding(bottom = 50.dp, top = 15.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
@@ -72,22 +74,47 @@ fun DashboardScreen(navController: NavController)
             modifier = Modifier.width(300.dp).padding(top = 40.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = {
-                    expanded=false
-                }
-            ) {
 
-            }
+                IconButton(onClick = { expanded = !expanded }) {
+                    Icon(Icons.Default.MoreVert, contentDescription = "More options")
+                }
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    DropdownMenuItem(
+                        text = { Text("Przychody") },
+                        onClick = {
+                            currentChartView = "Przychody"
+                            expanded = false
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Wydatki") },
+                        onClick = {
+                            currentChartView = "Wydatki"
+                            expanded = false
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Wszystko") },
+                        onClick = {
+                            currentChartView = "Wszystko"
+                            expanded = false
+                        }
+                    )
+                }
+
+
+
         }
 
         LineChart(
             modifier = Modifier.width(300.dp).height(300.dp),
-            data = remember {
+            data = remember(currentChartView) {
                 listOf(
                     Line(
-                        label = "testowy wykres",
+                        label = currentChartView,
                         values = testList,
                         color = SolidColor(Color(0xFF23af92)),
                         firstGradientFillColor = Color(0xFF2BC0A1).copy(alpha = .5f),
