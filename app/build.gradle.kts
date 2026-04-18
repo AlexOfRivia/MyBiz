@@ -44,6 +44,7 @@ dependencies {
     implementation(libs.firebase.auth)
     val nav_version = "2.9.7"
     implementation("androidx.navigation:navigation-compose:${nav_version}")
+    implementation ("io.github.ehsannarmani:compose-charts:0.2.5")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
