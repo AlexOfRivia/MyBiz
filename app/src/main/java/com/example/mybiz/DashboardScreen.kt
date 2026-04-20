@@ -38,6 +38,7 @@ fun DashboardScreen(navController: NavController)
     var SpendingsList = mutableListOf<Spending>()
 
     var testList = mutableListOf<Double>(1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0)
+    var testList2 = mutableListOf<Double>(6.0,3.5,3.0,6.7,9.8,4.20,6.9,12.0,9.0,11.0)
     var currentChartView by remember { mutableStateOf("Przychody") }
 
     //this dashboard will have charts etc.
@@ -111,19 +112,66 @@ fun DashboardScreen(navController: NavController)
 
         LineChart(
             modifier = Modifier.width(300.dp).height(300.dp),
-            data = remember(currentChartView) {
-                listOf(
-                    Line(
-                        label = currentChartView,
-                        values = testList,
-                        color = SolidColor(Color(0xFF23af92)),
-                        firstGradientFillColor = Color(0xFF2BC0A1).copy(alpha = .5f),
-                        secondGradientFillColor = Color.Transparent,
-                        strokeAnimationSpec = tween(2000, easing = EaseInOutCubic),
-                        gradientAnimationDelay = 1000,
-                        drawStyle = DrawStyle.Stroke(width=2.dp)
+            data = when(currentChartView) {
+                    "Przychody" -> listOf(
+                        Line(
+                            label = currentChartView,
+                            values = testList, //przychody
+                            color = SolidColor(Color(0xFF00C853)),
+                            firstGradientFillColor = Color(0xFF02A143).copy(alpha = .5f),
+                            secondGradientFillColor = Color.Transparent,
+                            strokeAnimationSpec = tween(2000, easing = EaseInOutCubic),
+                            gradientAnimationDelay = 1000,
+                            drawStyle = DrawStyle.Stroke(width=2.dp)
+                        ),
                     )
-                )
+                    "Wydatki" -> listOf(
+                        Line(
+                            label = currentChartView,
+                            values = testList2, //wydatki
+                            color = SolidColor(Color(0xFFD50000)),
+                            firstGradientFillColor = Color(0xFFCE1111).copy(alpha = .5f),
+                            secondGradientFillColor = Color.Transparent,
+                            strokeAnimationSpec = tween(2000, easing = EaseInOutCubic),
+                            gradientAnimationDelay = 1000,
+                            drawStyle = DrawStyle.Stroke(width=2.dp)
+                        )
+                    )
+                    "Wszystko" -> listOf(
+                        Line(
+                            label = "Przychody",
+                            values = testList, //przychody
+                            color = SolidColor(Color(0xFF00C853)),
+                            firstGradientFillColor = Color(0xFF02A143).copy(alpha = .5f),
+                            secondGradientFillColor = Color.Transparent,
+                            strokeAnimationSpec = tween(2000, easing = EaseInOutCubic),
+                            gradientAnimationDelay = 1000,
+                            drawStyle = DrawStyle.Stroke(width=2.dp)
+                        ),
+                        Line(
+                            label = "Wydatki",
+                            values = testList2, //wydatki
+                            color = SolidColor(Color(0xFFD50000)),
+                            firstGradientFillColor = Color(0xFFCE1111).copy(alpha = .5f),
+                            secondGradientFillColor = Color.Transparent,
+                            strokeAnimationSpec = tween(2000, easing = EaseInOutCubic),
+                            gradientAnimationDelay = 1000,
+                            drawStyle = DrawStyle.Stroke(width=2.dp)
+                        )
+                    )
+                    //defaultowo przychody
+                    else -> listOf(
+                        Line(
+                            label = "Przychody",
+                            values = testList, //przychody
+                            color = SolidColor(Color(0xFF00C853)),
+                            firstGradientFillColor = Color(0xFF02A143).copy(alpha = .5f),
+                            secondGradientFillColor = Color.Transparent,
+                            strokeAnimationSpec = tween(2000, easing = EaseInOutCubic),
+                            gradientAnimationDelay = 1000,
+                            drawStyle = DrawStyle.Stroke(width=2.dp)
+                        ),
+                    )
             },
             animationMode = AnimationMode.Together(delayBuilder = {it*500L})
         )
