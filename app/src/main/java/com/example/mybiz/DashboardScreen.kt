@@ -20,12 +20,10 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.mybiz.ui.theme.MyBizTheme
-import ir.ehsannarmani.compose_charts.LineChart
-import ir.ehsannarmani.compose_charts.models.AnimationMode
-import ir.ehsannarmani.compose_charts.models.DrawStyle
-import ir.ehsannarmani.compose_charts.models.Line
 import java.util.Date
-import kotlin.math.exp
+//imports for compose charts
+import ir.ehsannarmani.compose_charts.LineChart
+import ir.ehsannarmani.compose_charts.models.*
 
 data class Income(var amount: Double, var name: String, var date: Date)
 data class Spending(var amount: Double, var name: String, var dare: Date)
@@ -175,6 +173,8 @@ fun DashboardScreen(navController: NavController)
             },
             animationMode = AnimationMode.Together(delayBuilder = {it*500L})
         )
+
+        //LazyCollumn with all sorts of transactions will go there
         
     }
 }

@@ -13,7 +13,6 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.mybiz.ui.theme.MyBizTheme
 import com.google.firebase.Firebase
-import com.google.firebase.FirebaseApp.*
 import com.google.firebase.auth.*
 
 @Composable
