@@ -1,6 +1,5 @@
 package com.example.mybiz
 
-import android.widget.Spinner
 import androidx.compose.animation.core.EaseInOutCubic
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
@@ -15,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -104,7 +104,7 @@ fun DashboardScreen(navController: NavController)
                     )
                 }
 
-
+                //expense/income button here
 
         }
 
@@ -171,7 +171,15 @@ fun DashboardScreen(navController: NavController)
                         ),
                     )
             },
-            animationMode = AnimationMode.Together(delayBuilder = {it*500L})
+            animationMode = AnimationMode.Together(delayBuilder = {it*500L}),
+            //y-axis text
+            indicatorProperties = HorizontalIndicatorProperties (
+                textStyle = TextStyle(color = Color.White)
+            ),
+            //label text
+            labelHelperProperties = LabelHelperProperties (
+                textStyle = TextStyle(color = Color.White)
+            )
         )
 
         //LazyCollumn with all sorts of transactions will go there
