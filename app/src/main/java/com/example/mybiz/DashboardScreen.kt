@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.mybiz.ui.theme.MyBizTheme
@@ -34,6 +35,8 @@ fun DashboardScreen(navController: NavController)
 {
     var IncomeList = mutableListOf<Income>()
     var SpendingsList = mutableListOf<Spending>()
+
+    var authViewModel: AuthViewModel = viewModel()
 
     var testList = mutableListOf<Double>(1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0)
     var testList2 = mutableListOf<Double>(6.0,3.5,3.0,6.7,9.8,4.20,6.9,12.0,9.0,11.0)
@@ -58,7 +61,10 @@ fun DashboardScreen(navController: NavController)
             )
 
             TextButton(
-                onClick = {navController.navigate("main_screen")},
+                onClick = {
+                    authViewModel.signOut()
+                    navController.navigate("main_screen")
+                }
             ) {
                 Text(
                     text = "Wyloguj się",

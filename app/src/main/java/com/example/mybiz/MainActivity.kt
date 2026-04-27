@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
@@ -23,12 +24,14 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
+                    var authViewModel: AuthViewModel = viewModel()
                     val navigationController = rememberNavController()
+                    val startScreen = if(authViewModel.isUserLoggedIn.value) "dashboard_screen" else "main_screen"
 
                     NavHost(
                         navController = navigationController,
-                        startDestination = "main_screen"
-                    ) {
+                        startDestination = startScreen
+                    ){
                         //this is the route of all nav screens
                         composable("main_screen") {
                             MainScreen(navigationController) //passing the navigation controller for managing views
