@@ -31,12 +31,10 @@ data class Spending(var amount: Double, var name: String, var dare: Date)
 
 
 @Composable
-fun DashboardScreen(navController: NavController)
+fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel = viewModel())
 {
     var IncomeList = mutableListOf<Income>()
     var SpendingsList = mutableListOf<Spending>()
-
-    var authViewModel: AuthViewModel = viewModel()
 
     var testList = mutableListOf<Double>(1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0)
     var testList2 = mutableListOf<Double>(6.0,3.5,3.0,6.7,9.8,4.20,6.9,12.0,9.0,11.0)
@@ -111,6 +109,9 @@ fun DashboardScreen(navController: NavController)
                 }
 
                 //expense/income button here
+            Button(
+                onClick = { /*dialog window with an option to input expense/income*/ },
+            ) { Text("+") }
 
         }
 
