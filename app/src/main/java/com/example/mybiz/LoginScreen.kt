@@ -8,6 +8,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -17,7 +19,8 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.*
 
 @Composable
-fun LoginScreen(navController: NavController) {
+fun LoginScreen(navController: NavController)
+{
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
@@ -37,7 +40,7 @@ fun LoginScreen(navController: NavController) {
     ) {
         Text(
             text = "Zaloguj się",
-            color = MaterialTheme.colorScheme.primary,
+            color = Color(47, 186, 63),
             style = MaterialTheme.typography.headlineLarge,
             modifier = Modifier.padding(top = 70.dp, bottom = 200.dp)
         )
@@ -63,12 +66,16 @@ fun LoginScreen(navController: NavController) {
         //gotta add forgot password here
         TextButton(
             onClick = { navController.navigate("password_reset_screen") },
-                modifier = Modifier.padding(bottom = 60.dp)
-                ) {
-                    Text("Resetuj hasło")
-                }
+                modifier = Modifier.padding(bottom = 60.dp),
 
-        Button(
+            ) {
+                    Text(
+                        text = "Resetuj hasło",
+                        color = Color(47, 186, 63)
+                    )
+            }
+
+        ElevatedButton(
             onClick = {
                 if (email.isNotEmpty() && password.isNotEmpty()) {
                     auth?.signInWithEmailAndPassword(email, password)?.addOnCompleteListener { task ->
@@ -85,16 +92,22 @@ fun LoginScreen(navController: NavController) {
                 } },
                     modifier = Modifier
                         .width(200.dp)
-                        .padding(bottom = 50.dp, top = 60.dp)
+                        .padding(bottom = 50.dp, top = 60.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(47, 186, 63))
                 ) {
-                    Text("Dalej")
+                    Text(
+                        text = "Dalej",
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
                 }
             }
     }
 
     @Preview(showBackground = true)
     @Composable
-    fun LoginScreenPreview() {
+    fun LoginScreenPreview()
+    {
         MyBizTheme(darkTheme = true) {
             LoginScreen(navController = rememberNavController())
         }

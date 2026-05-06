@@ -11,6 +11,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -40,7 +42,7 @@ fun PasswordResetScreen(navController: NavController)
     ) {
         Text(
             text = "Resetuj hasło",
-            color = MaterialTheme.colorScheme.primary,
+            color = Color(47, 186, 63),
             style = MaterialTheme.typography.headlineLarge,
             modifier = Modifier.padding(top = 70.dp, bottom = 200.dp)
         )
@@ -54,7 +56,7 @@ fun PasswordResetScreen(navController: NavController)
             shape = RoundedCornerShape(12.dp)
         )
 
-        Button(
+        ElevatedButton(
             onClick = {
                 if(email.isNotEmpty())
                 {
@@ -70,9 +72,14 @@ fun PasswordResetScreen(navController: NavController)
                     android.widget.Toast.makeText(context, "Pole nie może być puste.", android.widget.Toast.LENGTH_LONG).show()
                 }
             },
-            modifier = Modifier.width(200.dp).padding(bottom = 50.dp, top = 80.dp)
+            modifier = Modifier.width(200.dp).padding(bottom = 50.dp, top = 80.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(47, 186, 63))
         ) {
-            Text("Dalej")
+            Text(
+                text = "Dalej",
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+            )
         }
     }
 }

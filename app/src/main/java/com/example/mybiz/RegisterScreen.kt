@@ -7,6 +7,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -35,7 +37,7 @@ fun RegisterScreen(navController: NavController)
     ) {
         Text(
             text = "Zarejestruj się",
-            color = MaterialTheme.colorScheme.primary,
+            color = Color(47, 186, 63),
             style = MaterialTheme.typography.headlineLarge,
             modifier = Modifier.padding(top = 70.dp, bottom = 150.dp)
         )
@@ -70,7 +72,7 @@ fun RegisterScreen(navController: NavController)
             shape = RoundedCornerShape(12.dp)
         )
 
-        Button(
+        ElevatedButton(
             onClick = {
                 if(password.isNotEmpty() && email.isNotEmpty())
                 {
@@ -84,9 +86,14 @@ fun RegisterScreen(navController: NavController)
                     }
                 }
             },
-            modifier = Modifier.width(200.dp).padding(bottom=50.dp, top = 50.dp)
+            modifier = Modifier.width(200.dp).padding(bottom=50.dp, top = 50.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(47, 186, 63))
         ) {
-            Text("Dalej")
+            Text(
+                text = "Dalej",
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+            )
         }
 
     }
