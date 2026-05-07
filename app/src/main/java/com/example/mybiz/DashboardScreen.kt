@@ -1,8 +1,7 @@
 package com.example.mybiz
 
 //imports for compose charts
-import android.R
-import android.widget.CheckBox
+import android.app.DatePickerDialog
 import androidx.compose.animation.core.EaseInOutCubic
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
@@ -16,18 +15,16 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -40,8 +37,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -56,6 +53,8 @@ import ir.ehsannarmani.compose_charts.models.DrawStyle
 import ir.ehsannarmani.compose_charts.models.HorizontalIndicatorProperties
 import ir.ehsannarmani.compose_charts.models.LabelHelperProperties
 import ir.ehsannarmani.compose_charts.models.Line
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.Date
 
 data class Income(var amount: Double, var name: String, var date: Date)
@@ -156,7 +155,10 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel =
                 onClick = {
                     show_dialog = true
                 },
-                modifier = Modifier.height(40.dp).width(60.dp).padding(top=10.dp),
+                modifier = Modifier
+                    .height(40.dp)
+                    .width(60.dp)
+                    .padding(top = 10.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(47, 186, 63))
             ) { Text(
                 text = "+",
@@ -261,14 +263,15 @@ fun OperationDialog(onDismissRequest: () -> Unit) {
     var title_input by remember { mutableStateOf("") }
     var amount_input by remember { mutableStateOf("") }
     var is_income by remember { mutableStateOf(false) }
-    var date_input by remember { mutableStateOf("") } //TRANSFORM TO DATE LATER!!!
+    var date_input by remember { mutableStateOf(LocalDate.now()) }
     Dialog(
         onDismissRequest = { onDismissRequest() }
     ) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(380.dp)
+                .height(450.dp)
+                .width(500.dp)
                 .padding(15.dp),
             shape = RoundedCornerShape(15.dp)
         ) {
@@ -311,12 +314,12 @@ fun OperationDialog(onDismissRequest: () -> Unit) {
                         shape = RoundedCornerShape(15.dp),
                         label = { Text("Kwota Operacji:") },
                         singleLine = true,
-                        modifier = Modifier.padding(15.dp)
+                        modifier = Modifier.padding(15.dp).weight(0.7f)
                     )
                     Text(
                         text = "PLN",
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(15.dp)
+                        modifier = Modifier.padding(top=40.dp).weight(0.3f),
                     )
 
                 }
@@ -333,12 +336,13 @@ fun OperationDialog(onDismissRequest: () -> Unit) {
                     )
 
                     Text(
-                        text = "PLN",
+                        text = "Przychód?",
+                        modifier = Modifier.padding(top=10.dp),
                         fontWeight = FontWeight.Bold
                     )
                 }
 
-                //Date field
+                DatePickerField("Data operacji", date_input, onDateSelected = {date_input = it}) //operation date field
 
                 Row( //dialog buttons row
                     modifier = Modifier.fillMaxWidth(),
@@ -367,6 +371,49 @@ fun OperationDialog(onDismissRequest: () -> Unit) {
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun DatePickerField(
+    label: String,
+    selectedDate: LocalDate,
+    onDateSelected: (LocalDate) -> Unit
+) {
+    val context = LocalContext.current
+    val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
+
+    OutlinedButton(
+        onClick = {
+            val datePicker = DatePickerDialog(
+                context,
+                { _, year, month, dayOfMonth ->
+                    val selected = LocalDate.of(year, month + 1, dayOfMonth)
+                    onDateSelected(selected)
+                },
+                selectedDate.year,
+                selectedDate.monthValue - 1,
+                selectedDate.dayOfMonth
+            )
+            datePicker.show()
+        },
+        modifier = Modifier
+            .padding(bottom = 40.dp)
+            .width(300.dp),
+        shape = RoundedCornerShape(15.dp)
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelSmall,
+                fontWeight = FontWeight.Bold,
+                color = Color(47, 186, 63))
+            Text(
+                text = selectedDate.format(formatter),
+                style = MaterialTheme.typography.bodyLarge,
+                color = Color.White
+            )
         }
     }
 }
