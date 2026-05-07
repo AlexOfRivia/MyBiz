@@ -1,10 +1,15 @@
 package com.example.mybiz
 
 //imports for compose charts
+import android.R
 import android.app.DatePickerDialog
+import android.content.Context
+import android.widget.Toast
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.EaseInOutCubic
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,6 +35,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -57,24 +63,21 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Date
 
-data class Income(var amount: Double, var name: String, var date: Date)
-data class Spending(var amount: Double, var name: String, var date: Date)
-
+data class Income(var amount: Double, var name: String, var date: LocalDate)
+data class Expense(var amount: Double, var name: String, var date: LocalDate)
 
 /*TODO
-*  change the white color to a sortof cream-ish tint
+*  change the white color to a sortof cream-ish tint, like 0xFFFFFDD0
 *  implement adding incomes and expenses
-*  implement showing incomes and expenses on chart*/
+*  implement showing incomes and expenses on chart, plus
+*  implementing the x-axis with dates*/
 
 @Composable
 fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel = viewModel()) {
-    var IncomeList = mutableListOf<Income>()
-    var SpendingsList = mutableListOf<Spending>()
+    val IncomeList = remember { mutableStateListOf<Income>() }
+    val ExpenseList = remember { mutableStateListOf<Expense>() }
 
     var show_dialog by remember { mutableStateOf(false) }
-
-    var testList = mutableListOf<Double>(1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0)
-    var testList2 = mutableListOf<Double>(6.0, 3.5, 3.0, 6.7, 9.8, 4.20, 6.9, 12.0, 9.0, 11.0)
     var currentChartView by remember { mutableStateOf("Przychody") }
 
     Column(
@@ -168,90 +171,71 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel =
 
         }
 
-        LineChart(
-            modifier = Modifier
-                .width(300.dp)
-                .height(300.dp),
-            data = when (currentChartView) {
-                "Przychody" -> listOf(
-                    Line(
-                        label = currentChartView,
-                        values = testList, //przychody
-                        color = SolidColor(Color(0xFF00C853)),
-                        firstGradientFillColor = Color(0xFF02A143).copy(alpha = .5f),
-                        secondGradientFillColor = Color.Transparent,
-                        strokeAnimationSpec = tween(2000, easing = EaseInOutCubic),
-                        gradientAnimationDelay = 1000,
-                        drawStyle = DrawStyle.Stroke(width = 2.dp)
-                    ),
-                )
+        val incomeValues = IncomeList.map { it.amount }
+        val expenseValues = ExpenseList.map { it.amount }
 
-                "Wydatki" -> listOf(
-                    Line(
-                        label = currentChartView,
-                        values = testList2, //wydatki
-                        color = SolidColor(Color(0xFFD50000)),
-                        firstGradientFillColor = Color(0xFFCE1111).copy(alpha = .5f),
-                        secondGradientFillColor = Color.Transparent,
-                        strokeAnimationSpec = tween(2000, easing = EaseInOutCubic),
-                        gradientAnimationDelay = 1000,
-                        drawStyle = DrawStyle.Stroke(width = 2.dp)
-                    )
-                )
+        val hasData = when (currentChartView) {
+            "Przychody" -> incomeValues.isNotEmpty()
+            "Wydatki" -> expenseValues.isNotEmpty()
+            "Wszystko" -> incomeValues.isNotEmpty() || expenseValues.isNotEmpty()
+            else -> incomeValues.isNotEmpty()
+        }
 
-                "Wszystko" -> listOf(
-                    Line(
-                        label = "Przychody",
-                        values = testList, //przychody
-                        color = SolidColor(Color(0xFF00C853)),
-                        firstGradientFillColor = Color(0xFF02A143).copy(alpha = .5f),
-                        secondGradientFillColor = Color.Transparent,
-                        strokeAnimationSpec = tween(2000, easing = EaseInOutCubic),
-                        gradientAnimationDelay = 1000,
-                        drawStyle = DrawStyle.Stroke(width = 2.dp)
-                    ),
-                    Line(
-                        label = "Wydatki",
-                        values = testList2, //wydatki
-                        color = SolidColor(Color(0xFFD50000)),
-                        firstGradientFillColor = Color(0xFFCE1111).copy(alpha = .5f),
-                        secondGradientFillColor = Color.Transparent,
-                        strokeAnimationSpec = tween(2000, easing = EaseInOutCubic),
-                        gradientAnimationDelay = 1000,
-                        drawStyle = DrawStyle.Stroke(width = 2.dp)
-                    )
-                )
-                //defaultowo przychody
-                else -> listOf(
-                    Line(
-                        label = "Przychody",
-                        values = testList, //przychody
-                        color = SolidColor(Color(0xFF00C853)),
-                        firstGradientFillColor = Color(0xFF02A143).copy(alpha = .5f),
-                        secondGradientFillColor = Color.Transparent,
-                        strokeAnimationSpec = tween(2000, easing = EaseInOutCubic),
-                        gradientAnimationDelay = 1000,
-                        drawStyle = DrawStyle.Stroke(width = 2.dp)
-                    ),
-                )
-            },
-            animationMode = AnimationMode.Together(delayBuilder = { it * 500L }),
-            //y-axis text
-            indicatorProperties = HorizontalIndicatorProperties(
-                textStyle = TextStyle(color = Color.White)
-            ),
-            //label text
-            labelHelperProperties = LabelHelperProperties(
-                textStyle = TextStyle(color = Color.White)
+        if(!hasData)
+        {
+            Box(
+                modifier = Modifier.width(300.dp).height(300.dp),
+                contentAlignment = Alignment.Center
+            ){
+                Text(text = "Brak danych do pokazania :(", color = Color(47, 186, 63), fontWeight = FontWeight.Bold)
+            }
+        } else {
+            LineChart(
+                modifier = Modifier.width(300.dp).height(300.dp),
+                data = remember(currentChartView, incomeValues, expenseValues) {
+                    val lines = mutableListOf<Line>() //chart lines
+
+                    //income line
+                    if ((currentChartView == "Przychody" || currentChartView == "Wszystko") && incomeValues.isNotEmpty())
+                    {
+                        lines.add(Line(
+                            label = "Przychody",
+                            values = incomeValues,
+                            color = SolidColor(Color(0xFF00C853)),
+                            firstGradientFillColor = Color(0xFF02A143).copy(alpha = .5f),
+                            secondGradientFillColor = Color.Transparent,
+                            strokeAnimationSpec = tween(2000, easing = EaseInOutCubic),
+                            drawStyle = DrawStyle.Stroke(width = 2.dp)
+                        ))
+                    }
+
+                    //expense line
+                    if ((currentChartView == "Wydatki" || currentChartView == "Wszystko") && expenseValues.isNotEmpty()) {
+                        lines.add(Line(
+                            label = "Wydatki",
+                            values = expenseValues,
+                            color = SolidColor(Color(0xFFD50000)),
+                            firstGradientFillColor = Color(0xFFCE1111).copy(alpha = .5f),
+                            secondGradientFillColor = Color.Transparent,
+                            strokeAnimationSpec = tween(2000, easing = EaseInOutCubic),
+                            drawStyle = DrawStyle.Stroke(width = 2.dp)
+                        ))
+                    }
+                    lines
+                },
+                animationMode = AnimationMode.Together(delayBuilder = { it * 500L }),
+                indicatorProperties = HorizontalIndicatorProperties(textStyle = TextStyle(color = Color.White)),
+                labelHelperProperties = LabelHelperProperties(textStyle = TextStyle(color = Color.White))
             )
-        )
+        }
+
 
         //LazyCollumn with all sorts of transactions will go there
 
         //Operation dialog window handling
         if(show_dialog)
         {
-            OperationDialog(onDismissRequest = {show_dialog = false})
+            OperationDialog(onDismissRequest = {show_dialog = false}, IncomeList, ExpenseList)
         }
 
     }
@@ -259,11 +243,16 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel =
 
 //Custom dialog window for adding a new operation
 @Composable
-fun OperationDialog(onDismissRequest: () -> Unit) {
+fun OperationDialog(onDismissRequest: () -> Unit, IncomeList: MutableList<Income>, ExpenseList: MutableList<Expense>) {
     var title_input by remember { mutableStateOf("") }
     var amount_input by remember { mutableStateOf("") }
     var is_income by remember { mutableStateOf(false) }
     var date_input by remember { mutableStateOf(LocalDate.now()) }
+
+    val amount_regex =Regex("^[+]?([0-9]+(?:[\\.][0-9]{0,2})?|\\.[0-9]{0,2})$")
+
+    val context = LocalContext.current
+
     Dialog(
         onDismissRequest = { onDismissRequest() }
     ) {
@@ -309,7 +298,10 @@ fun OperationDialog(onDismissRequest: () -> Unit) {
                                 amount_input = newValue
                                 return@OutlinedTextField
                             }
-                            amount_input = newValue
+                            if(newValue.matches(amount_regex))
+                            {
+                                amount_input = newValue
+                            }
                         },
                         shape = RoundedCornerShape(15.dp),
                         label = { Text("Kwota Operacji:") },
@@ -349,8 +341,7 @@ fun OperationDialog(onDismissRequest: () -> Unit) {
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     TextButton( //dismiss button
-                        onClick = { onDismissRequest() },
-
+                        onClick = { onDismissRequest() }
                     ) {
                         Text(
                             text = "Anuluj",
@@ -360,7 +351,24 @@ fun OperationDialog(onDismissRequest: () -> Unit) {
                     }
 
                     TextButton( //accept button
-                        onClick = {},
+                        onClick = {
+                            //adding the new operation to the income/expense list
+                            //creating a new data class object and adding it to the list according to the
+                            //boolean value
+
+                            if(!title_input.isEmpty() && !amount_input.isEmpty())
+                            {
+                                onDismissRequest()
+                                if(is_income)
+                                {
+                                    IncomeList.add(Income(amount_input.toDouble(),title_input,date_input))
+                                } else {
+                                    ExpenseList.add(Expense(amount_input.toDouble(),title_input,date_input))
+                                }
+                            } else {
+                                Toast.makeText(context, "Wszystkie pola muszą być uzupełnione!", Toast.LENGTH_LONG).show()
+                            }
+                        }
 
                         ) {
                         Text(
