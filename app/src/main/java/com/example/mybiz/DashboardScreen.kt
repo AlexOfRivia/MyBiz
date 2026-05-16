@@ -7,6 +7,7 @@ import androidx.compose.animation.core.EaseInOutCubic
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -100,7 +101,7 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel =
 
         Row(
             modifier = Modifier
-                .width(300.dp)
+                .width(350.dp)
                 .padding(top = 40.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -167,17 +168,22 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel =
         if(!hasData)
         {
             Box(
-                modifier = Modifier.width(300.dp).
-                                    height(300.dp).
-                                    clip(RoundedCornerShape(12.dp)).
-                                    background(Color(22, 22, 26)),
+                modifier = Modifier
+                    .width(350.dp)
+                    .height(300.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Color(22, 22, 26))
+                    .padding(bottom=10.dp),
                 contentAlignment = Alignment.Center
             ){
                 Text(text = "Brak danych do pokazania :(", color = Color(47, 186, 63), fontWeight = FontWeight.Bold)
             }
         } else {
             LineChart(
-                modifier = Modifier.width(300.dp).height(300.dp),
+                modifier = Modifier
+                    .width(350.dp)
+                    .height(300.dp)
+                    .padding(bottom=10.dp),
                 data = remember(currentChartView, incomeValues, expenseValues) { //adding the remember makes sure, that the chart will refresh only when one of these three changes
                     val lines = mutableListOf<Line>() //chart lines
 
@@ -216,27 +222,102 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel =
         }
 
         Box(
-            modifier = Modifier.width(300.dp).
-                                height(300.dp).
-                                clip(RoundedCornerShape(12.dp)).
-                                background(Color(22, 22, 26)),
+            modifier = Modifier
+                .width(350.dp)
+                .height(300.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .background(Color(22, 22, 26)),
             contentAlignment = Alignment.Center
         ){
             //LazyCollumn with all sorts of transactions will go there
             LazyColumn(
-                modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(12.dp)),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(RoundedCornerShape(12.dp)),
             ) {
                 //creating a box with a row and all transaction info
                 //checking for currently selected view option
                 if((currentChartView == "Przychody" || currentChartView == "Wszystko") && incomeValues.isNotEmpty())
                 {
+                    //showing income list
                     items(IncomeList) { item -> //for every item in list:
+                        Box(
+                            modifier = Modifier
+                                .width(340.dp)
+                                .height(25.dp)
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(Color(36, 36, 36))
+                                .padding(top=2.dp),
+                            contentAlignment = Alignment.Center
+                        ){
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(
+                                    text = item.name,
+                                    color = Color.White,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    modifier = Modifier.weight(0.3f)
+                                )
 
+                                Text(
+                                    text = item.date.toString(),
+                                    color = Color.White,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    modifier = Modifier.weight(0.3f)
+                                )
+
+                                Text(
+                                    text = (item.amount.toString()+"PLN"),
+                                    color = Color.White,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.weight(0.3f)
+                                )
+                            }
+                        }
                     }
                 }
                 if((currentChartView == "Wydatki" || currentChartView == "Wszystko") && expenseValues.isNotEmpty())
                 {
                     //showing expense items
+                    items(ExpenseList) { item -> //for every item in list:
+                        Box(
+                            modifier = Modifier
+                                .width(340.dp)
+                                .height(25.dp)
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(Color(36, 36, 36))
+                                .padding(top = 2.dp),
+                            contentAlignment = Alignment.Center
+                        ){
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(
+                                    text = item.name,
+                                    color = Color.White,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    modifier = Modifier.weight(0.3f)
+                                )
+
+                                Text(
+                                    text = item.date.toString(),
+                                    color = Color.White,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    modifier = Modifier.weight(0.3f)
+                                )
+
+                                Text(
+                                    text = "-"+(item.amount.toString()+"PLN"),
+                                    color = Color.White,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.weight(0.3f)
+                                )
+                            }
+                        }
+                    }
                 }
 
             }
@@ -316,12 +397,16 @@ fun OperationDialog(onDismissRequest: () -> Unit, IncomeList: MutableList<Income
                         shape = RoundedCornerShape(15.dp),
                         label = { Text("Kwota Operacji:") },
                         singleLine = true,
-                        modifier = Modifier.padding(15.dp).weight(0.7f)
+                        modifier = Modifier
+                            .padding(15.dp)
+                            .weight(0.7f)
                     )
                     Text(
                         text = "PLN",
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(top=40.dp).weight(0.3f),
+                        modifier = Modifier
+                            .padding(top = 40.dp)
+                            .weight(0.3f),
                     )
 
                 }
