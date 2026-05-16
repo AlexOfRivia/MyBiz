@@ -1,38 +1,18 @@
 package com.example.mybiz
 
-//imports for compose charts
-import android.R
 import android.app.DatePickerDialog
 import android.content.Context
 import android.widget.Toast
-import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.EaseInOutCubic
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ElevatedButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -41,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
@@ -53,24 +34,26 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.mybiz.ui.theme.MyBizTheme
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+
+//imports for compose charts
 import ir.ehsannarmani.compose_charts.LineChart
 import ir.ehsannarmani.compose_charts.models.AnimationMode
 import ir.ehsannarmani.compose_charts.models.DrawStyle
 import ir.ehsannarmani.compose_charts.models.HorizontalIndicatorProperties
 import ir.ehsannarmani.compose_charts.models.LabelHelperProperties
 import ir.ehsannarmani.compose_charts.models.Line
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.util.Date
+
 
 data class Income(var amount: Double, var name: String, var date: LocalDate)
 data class Expense(var amount: Double, var name: String, var date: LocalDate)
 
 /*TODO
 *  change the white color to a sortof cream-ish tint, like 0xFFFFFDD0
-*  implement adding incomes and expenses
-*  implement showing incomes and expenses on chart, plus
-*  implementing the x-axis with dates*/
+*  implement the Room database and saving user info to Firebase
+*
+*  Get to know sealed function!!!!*/
 
 @Composable
 fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel = viewModel()) {
@@ -94,7 +77,7 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel =
         ) {
             Text(
                 text = "Witaj, imię",
-                color = MaterialTheme.colorScheme.secondary,
+                color = Color.White,
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.padding(10.dp)
             )
@@ -184,7 +167,10 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel =
         if(!hasData)
         {
             Box(
-                modifier = Modifier.width(300.dp).height(300.dp),
+                modifier = Modifier.width(300.dp).
+                                    height(300.dp).
+                                    clip(RoundedCornerShape(12.dp)).
+                                    background(Color(22, 22, 26)),
                 contentAlignment = Alignment.Center
             ){
                 Text(text = "Brak danych do pokazania :(", color = Color(47, 186, 63), fontWeight = FontWeight.Bold)
@@ -192,7 +178,7 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel =
         } else {
             LineChart(
                 modifier = Modifier.width(300.dp).height(300.dp),
-                data = remember(currentChartView, incomeValues, expenseValues) {
+                data = remember(currentChartView, incomeValues, expenseValues) { //adding the remember makes sure, that the chart will refresh only when one of these three changes
                     val lines = mutableListOf<Line>() //chart lines
 
                     //income line
@@ -225,12 +211,36 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel =
                 },
                 animationMode = AnimationMode.Together(delayBuilder = { it * 500L }),
                 indicatorProperties = HorizontalIndicatorProperties(textStyle = TextStyle(color = Color.White)),
-                labelHelperProperties = LabelHelperProperties(textStyle = TextStyle(color = Color.White))
+                labelHelperProperties = LabelHelperProperties(textStyle = TextStyle(color = Color.White)),
             )
         }
 
+        Box(
+            modifier = Modifier.width(300.dp).
+                                height(300.dp).
+                                clip(RoundedCornerShape(12.dp)).
+                                background(Color(22, 22, 26)),
+            contentAlignment = Alignment.Center
+        ){
+            //LazyCollumn with all sorts of transactions will go there
+            LazyColumn(
+                modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(12.dp)),
+            ) {
+                //creating a box with a row and all transaction info
+                //checking for currently selected view option
+                if((currentChartView == "Przychody" || currentChartView == "Wszystko") && incomeValues.isNotEmpty())
+                {
+                    items(IncomeList) { item -> //for every item in list:
 
-        //LazyCollumn with all sorts of transactions will go there
+                    }
+                }
+                if((currentChartView == "Wydatki" || currentChartView == "Wszystko") && expenseValues.isNotEmpty())
+                {
+                    //showing expense items
+                }
+
+            }
+        }
 
         //Operation dialog window handling
         if(show_dialog)
@@ -266,7 +276,7 @@ fun OperationDialog(onDismissRequest: () -> Unit, IncomeList: MutableList<Income
         ) {
 
 
-            Column(     //main column
+            Column(    //main column
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
@@ -352,10 +362,6 @@ fun OperationDialog(onDismissRequest: () -> Unit, IncomeList: MutableList<Income
 
                     TextButton( //accept button
                         onClick = {
-                            //adding the new operation to the income/expense list
-                            //creating a new data class object and adding it to the list according to the
-                            //boolean value
-
                             if(!title_input.isEmpty() && !amount_input.isEmpty())
                             {
                                 onDismissRequest()
