@@ -229,13 +229,13 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel =
                 .background(Color(22, 22, 26)),
             contentAlignment = Alignment.Center
         ){
-            //LazyCollumn with all sorts of transactions will go there
-            LazyColumn(
+            LazyColumn(     //transaction lazy column
                 modifier = Modifier
                     .fillMaxSize()
                     .clip(RoundedCornerShape(12.dp)),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                //creating a box with a row and all transaction info
                 //checking for currently selected view option
                 if((currentChartView == "Przychody" || currentChartView == "Wszystko") && incomeValues.isNotEmpty())
                 {
@@ -246,8 +246,7 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel =
                                 .width(340.dp)
                                 .height(25.dp)
                                 .clip(RoundedCornerShape(12.dp))
-                                .background(Color(36, 36, 36))
-                                .padding(top=2.dp),
+                                .background(Color(36, 36, 36)),
                             contentAlignment = Alignment.Center
                         ){
                             Row(
@@ -287,8 +286,7 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel =
                                 .width(340.dp)
                                 .height(25.dp)
                                 .clip(RoundedCornerShape(12.dp))
-                                .background(Color(36, 36, 36))
-                                .padding(top = 2.dp),
+                                .background(Color(36, 36, 36)),
                             contentAlignment = Alignment.Center
                         ){
                             Row(
