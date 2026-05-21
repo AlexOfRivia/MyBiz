@@ -37,6 +37,8 @@ import androidx.navigation.compose.rememberNavController
 import com.example.mybiz.ui.theme.MyBizTheme
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
 //imports for compose charts
 import ir.ehsannarmani.compose_charts.LineChart
@@ -46,15 +48,29 @@ import ir.ehsannarmani.compose_charts.models.HorizontalIndicatorProperties
 import ir.ehsannarmani.compose_charts.models.LabelHelperProperties
 import ir.ehsannarmani.compose_charts.models.Line
 
+@Entity(tableName = "Incomes")      //initializing a new table
+data class Income (
+    @PrimaryKey(autoGenerate = true)
+    val id: Long = 0,
+    var amount: Double,
+    var name: String,
+    var date: LocalDate
+)
 
-data class Income(var amount: Double, var name: String, var date: LocalDate)
-data class Expense(var amount: Double, var name: String, var date: LocalDate)
+@Entity(tableName = "Expenses")
+data class Expense (
+    @PrimaryKey(autoGenerate = true)        //auto-incremented id as primary key
+    val id: Long = 0,
+    var amount: Double,
+    var name: String,
+    var date: LocalDate
+)
 
 /*TODO
 *  change the white color to a sortof cream-ish tint, like 0xFFFFFDD0
 *  implement the Room database and saving user info to Firebase
 *
-*  Get to know sealed function!!!!*/
+*/
 
 @Composable
 fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel = viewModel()) {
@@ -169,11 +185,11 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel =
         {
             Box(
                 modifier = Modifier
+                    .padding(bottom=10.dp)
                     .width(350.dp)
                     .height(300.dp)
                     .clip(RoundedCornerShape(12.dp))
-                    .background(Color(22, 22, 26))
-                    .padding(bottom=10.dp),
+                    .background(Color(22, 22, 26)),
                 contentAlignment = Alignment.Center
             ){
                 Text(text = "Brak danych do pokazania :(", color = Color(47, 186, 63), fontWeight = FontWeight.Bold)
@@ -181,9 +197,9 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel =
         } else {
             LineChart(
                 modifier = Modifier
+                    .padding(bottom=10.dp)
                     .width(350.dp)
-                    .height(300.dp)
-                    .padding(bottom=10.dp),
+                    .height(300.dp),
                 data = remember(currentChartView, incomeValues, expenseValues) { //adding the remember makes sure, that the chart will refresh only when one of these three changes
                     val lines = mutableListOf<Line>() //chart lines
 
@@ -234,7 +250,7 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel =
                     .fillMaxSize()
                     .clip(RoundedCornerShape(12.dp)),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(4.dp)
+                //verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 //checking for currently selected view option
                 if((currentChartView == "Przychody" || currentChartView == "Wszystko") && incomeValues.isNotEmpty())
@@ -243,8 +259,9 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel =
                     items(IncomeList) { item -> //for every item in list:
                         Box(
                             modifier = Modifier
+                                .padding(top=4.dp)
                                 .width(340.dp)
-                                .height(25.dp)
+                                .height(30.dp)
                                 .clip(RoundedCornerShape(12.dp))
                                 .background(Color(36, 36, 36)),
                             contentAlignment = Alignment.Center
@@ -257,21 +274,21 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel =
                                     text = item.name,
                                     color = Color.White,
                                     style = MaterialTheme.typography.bodyMedium,
-                                    modifier = Modifier.weight(0.3f)
+                                    modifier = Modifier.weight(0.4f)
                                 )
 
                                 Text(
                                     text = item.date.toString(),
                                     color = Color.White,
                                     style = MaterialTheme.typography.bodyMedium,
-                                    modifier = Modifier.weight(0.3f)
+                                    modifier = Modifier.weight(0.2f)
                                 )
 
                                 Text(
                                     text = (item.amount.toString()+"PLN"),
                                     color = Color.White,
                                     fontWeight = FontWeight.Bold,
-                                    modifier = Modifier.weight(0.3f)
+                                    modifier = Modifier.weight(0.2f)
                                 )
                             }
                         }
@@ -283,8 +300,9 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel =
                     items(ExpenseList) { item -> //for every item in list:
                         Box(
                             modifier = Modifier
+                                .padding(top=4.dp)
                                 .width(340.dp)
-                                .height(25.dp)
+                                .height(30.dp)
                                 .clip(RoundedCornerShape(12.dp))
                                 .background(Color(36, 36, 36)),
                             contentAlignment = Alignment.Center
@@ -297,21 +315,22 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel =
                                     text = item.name,
                                     color = Color.White,
                                     style = MaterialTheme.typography.bodyMedium,
-                                    modifier = Modifier.weight(0.3f)
+                                    modifier = Modifier.weight(0.4f)
                                 )
 
                                 Text(
                                     text = item.date.toString(),
                                     color = Color.White,
                                     style = MaterialTheme.typography.bodyMedium,
-                                    modifier = Modifier.weight(0.3f)
+                                    modifier = Modifier.weight(0.2f)
                                 )
 
                                 Text(
                                     text = "-"+(item.amount.toString()+"PLN"),
                                     color = Color.White,
+                                    style = MaterialTheme.typography.bodyMedium,
                                     fontWeight = FontWeight.Bold,
-                                    modifier = Modifier.weight(0.3f)
+                                    modifier = Modifier.weight(0.2f)
                                 )
                             }
                         }
@@ -332,7 +351,11 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel =
 
 //Custom dialog window for adding a new operation
 @Composable
-fun OperationDialog(onDismissRequest: () -> Unit, IncomeList: MutableList<Income>, ExpenseList: MutableList<Expense>) {
+fun OperationDialog(
+    onDismissRequest: () -> Unit,
+    IncomeList: MutableList<Income>,
+    ExpenseList: MutableList<Expense>
+) {
     var title_input by remember { mutableStateOf("") }
     var amount_input by remember { mutableStateOf("") }
     var is_income by remember { mutableStateOf(false) }
@@ -450,9 +473,9 @@ fun OperationDialog(onDismissRequest: () -> Unit, IncomeList: MutableList<Income
                                 onDismissRequest()
                                 if(is_income)
                                 {
-                                    IncomeList.add(Income(amount_input.toDouble(),title_input,date_input))
+                                    IncomeList.add(Income(amount = amount_input.toDouble(), name = title_input, date = date_input))
                                 } else {
-                                    ExpenseList.add(Expense(amount_input.toDouble(),title_input,date_input))
+                                    ExpenseList.add(Expense(amount = amount_input.toDouble(), name = title_input, date = date_input))
                                 }
                             } else {
                                 Toast.makeText(context, "Wszystkie pola muszą być uzupełnione!", Toast.LENGTH_LONG).show()
