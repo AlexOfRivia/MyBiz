@@ -1,6 +1,5 @@
 package com.example.mybiz
 
-//imports for compose charts
 import android.app.DatePickerDialog
 import android.widget.Toast
 import androidx.compose.animation.core.EaseInOutCubic
@@ -14,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -44,7 +44,10 @@ import ir.ehsannarmani.compose_charts.models.HorizontalIndicatorProperties
 import ir.ehsannarmani.compose_charts.models.LabelHelperProperties
 import ir.ehsannarmani.compose_charts.models.Line
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -69,7 +72,7 @@ data class Expense (
 /*TODO
 *  change the white color to a sortof cream-ish tint, like 0xFFFFFDD0
 *  implement the Room database and saving user info to Firebase
-*
+*  Add a spinwheel while loading data from db
 */
 
 @Composable
@@ -81,12 +84,24 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel =
     val incomeDAO = db.IncomeDAO()
     val expenseDAO = db.ExpenseDAO()
 
-
-    //should implement:
-    // try: get income and expense from db
-    // catch: create new empty lists
     val IncomeList = remember { mutableStateListOf<Income>() }
     val ExpenseList = remember { mutableStateListOf<Expense>() }
+
+    LaunchedEffect(Unit)        //unit makes sure that this will only execute upon startup
+    {
+        withContext(Dispatchers.IO)
+        {
+            incomeDAO.getAllIncomes().collect { AllIncomes ->
+                IncomeList.clear()
+                IncomeList.addAll(AllIncomes)
+            }
+
+            expenseDAO.getAllExpenses().collect { AllExpenses ->
+                ExpenseList.clear()
+                ExpenseList.addAll(AllExpenses)
+            }
+        }
+    }
 
     var show_dialog by remember { mutableStateOf(false) }
     var currentChartView by remember { mutableStateOf("Przychody") }
@@ -508,7 +523,7 @@ fun OperationDialog(
                                         expenseDAO.insert(newExpense)
                                     }
 
-                                    Toast.makeText(context, "Wydatek dodany pomyślnie!", Toast.LENGTH_SHORT).show()
+                                     Toast.makeText(context, "Wydatek dodany pomyślnie!", Toast.LENGTH_SHORT).show()
                                 }
                             } else {
                                 Toast.makeText(context, "Wszystkie pola muszą być uzupełnione!", Toast.LENGTH_LONG).show()

@@ -43,7 +43,7 @@ android {
 
 dependencies {
     val nav_version = "2.9.7"
-    val roomVersion = "2.6.1"
+    val roomVersion = "2.8.4"
 
     implementation(libs.firebase.auth)
     implementation(libs.androidx.compose.ui.text)
