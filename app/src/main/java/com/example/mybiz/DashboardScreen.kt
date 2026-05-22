@@ -1,13 +1,12 @@
 package com.example.mybiz
 
+//imports for compose charts
 import android.app.DatePickerDialog
-import android.content.Context
 import android.widget.Toast
 import androidx.compose.animation.core.EaseInOutCubic
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,6 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,19 +34,19 @@ import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.mybiz.ui.theme.MyBizTheme
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-
-//imports for compose charts
+import com.example.mybiz.ui.theme.MyBizTheme
 import ir.ehsannarmani.compose_charts.LineChart
 import ir.ehsannarmani.compose_charts.models.AnimationMode
 import ir.ehsannarmani.compose_charts.models.DrawStyle
 import ir.ehsannarmani.compose_charts.models.HorizontalIndicatorProperties
 import ir.ehsannarmani.compose_charts.models.LabelHelperProperties
 import ir.ehsannarmani.compose_charts.models.Line
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @Entity(tableName = "Incomes")      //initializing a new table
 data class Income (
@@ -73,7 +73,18 @@ data class Expense (
 */
 
 @Composable
-fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel = viewModel()) {
+fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel = viewModel())
+{
+    val context = LocalContext.current
+
+    val db = AppDatabase.getDatabase(context)           //db related stuff
+    val incomeDAO = db.IncomeDAO()
+    val expenseDAO = db.ExpenseDAO()
+
+
+    //should implement:
+    // try: get income and expense from db
+    // catch: create new empty lists
     val IncomeList = remember { mutableStateListOf<Income>() }
     val ExpenseList = remember { mutableStateListOf<Expense>() }
 
@@ -343,7 +354,7 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel =
         //Operation dialog window handling
         if(show_dialog)
         {
-            OperationDialog(onDismissRequest = {show_dialog = false}, IncomeList, ExpenseList)
+            OperationDialog(onDismissRequest = {show_dialog = false}, IncomeList = IncomeList,ExpenseList =  ExpenseList, incomeDAO = incomeDAO, expenseDAO = expenseDAO)
         }
 
     }
@@ -354,8 +365,14 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel =
 fun OperationDialog(
     onDismissRequest: () -> Unit,
     IncomeList: MutableList<Income>,
-    ExpenseList: MutableList<Expense>
+    ExpenseList: MutableList<Expense>,
+    incomeDAO: IncomeDAO,
+    expenseDAO: ExpenseDAO
 ) {
+
+    val coroutineScope = rememberCoroutineScope()
+
+
     var title_input by remember { mutableStateOf("") }
     var amount_input by remember { mutableStateOf("") }
     var is_income by remember { mutableStateOf(false) }
@@ -473,9 +490,25 @@ fun OperationDialog(
                                 onDismissRequest()
                                 if(is_income)
                                 {
-                                    IncomeList.add(Income(amount = amount_input.toDouble(), name = title_input, date = date_input))
+                                    val newIncome = Income(amount = amount_input.toDouble(), name = title_input, date = date_input)
+                                    IncomeList.add(newIncome)
+
+                                    coroutineScope.launch(Dispatchers.IO)
+                                    {
+                                        incomeDAO.insert(newIncome)
+                                    }
+
+                                    Toast.makeText(context, "Przychód dodany pomyślnie!", Toast.LENGTH_SHORT).show()
                                 } else {
-                                    ExpenseList.add(Expense(amount = amount_input.toDouble(), name = title_input, date = date_input))
+                                    val newExpense = Expense(amount = amount_input.toDouble(), name = title_input, date = date_input)
+                                    ExpenseList.add(newExpense)
+
+                                    coroutineScope.launch(Dispatchers.IO)
+                                    {
+                                        expenseDAO.insert(newExpense)
+                                    }
+
+                                    Toast.makeText(context, "Wydatek dodany pomyślnie!", Toast.LENGTH_SHORT).show()
                                 }
                             } else {
                                 Toast.makeText(context, "Wszystkie pola muszą być uzupełnione!", Toast.LENGTH_LONG).show()

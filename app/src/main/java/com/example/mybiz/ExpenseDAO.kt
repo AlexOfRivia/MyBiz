@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 interface ExpenseDAO
 {
     @Query("SELECT * FROM Expenses")
-    fun getAllExpenses(): Flow<List<Expense>>   //returns all expenses in db
+    fun getAllExpenses(): Flow<MutableList<Expense>>   //returns all expenses in db
 
     @Insert
     suspend fun insert(expense: Expense)        //inserts new expense
