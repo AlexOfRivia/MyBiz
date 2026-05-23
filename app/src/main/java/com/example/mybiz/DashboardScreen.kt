@@ -70,7 +70,6 @@ data class Expense (
 )
 
 /*TODO
-*  change the white color to a sortof cream-ish tint, like 0xFFFFFDD0
 *  implement the Room database and saving user info to Firebase
 *  Add a spinwheel while loading data from db
 */
@@ -91,14 +90,20 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel =
     {
         withContext(Dispatchers.IO)
         {
-            incomeDAO.getAllIncomes().collect { AllIncomes ->
+            incomeDAO.getAllIncomes().collect { allIncomes ->       //collecting data from the flow basically
                 IncomeList.clear()
-                IncomeList.addAll(AllIncomes)
+                IncomeList.addAll(allIncomes)
             }
+        }
+    }
 
-            expenseDAO.getAllExpenses().collect { AllExpenses ->
+    LaunchedEffect(Unit)
+    {
+        withContext(Dispatchers.IO)
+        {
+            expenseDAO.getAllExpenses().collect { allExpenses ->
                 ExpenseList.clear()
-                ExpenseList.addAll(AllExpenses)
+                ExpenseList.addAll(allExpenses)
             }
         }
     }
@@ -293,7 +298,7 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel =
                             contentAlignment = Alignment.Center
                         ){
                             Row(
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier.fillMaxWidth().padding(5.dp),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 Text(
@@ -334,7 +339,7 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel =
                             contentAlignment = Alignment.Center
                         ){
                             Row(
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier.fillMaxWidth().padding(5.dp),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 Text(
@@ -502,7 +507,7 @@ fun OperationDialog(
                         onClick = {
                             if(!title_input.isEmpty() && !amount_input.isEmpty())
                             {
-                                onDismissRequest()
+
                                 if(is_income)
                                 {
                                     val newIncome = Income(amount = amount_input.toDouble(), name = title_input, date = date_input)
@@ -512,8 +517,8 @@ fun OperationDialog(
                                     {
                                         incomeDAO.insert(newIncome)
                                     }
-
                                     Toast.makeText(context, "Przychód dodany pomyślnie!", Toast.LENGTH_SHORT).show()
+
                                 } else {
                                     val newExpense = Expense(amount = amount_input.toDouble(), name = title_input, date = date_input)
                                     ExpenseList.add(newExpense)
@@ -522,9 +527,9 @@ fun OperationDialog(
                                     {
                                         expenseDAO.insert(newExpense)
                                     }
-
-                                     Toast.makeText(context, "Wydatek dodany pomyślnie!", Toast.LENGTH_SHORT).show()
+                                    //Toast.makeText(context, "Wydatek dodany pomyślnie!", Toast.LENGTH_SHORT).show()
                                 }
+                                onDismissRequest()
                             } else {
                                 Toast.makeText(context, "Wszystkie pola muszą być uzupełnione!", Toast.LENGTH_LONG).show()
                             }
