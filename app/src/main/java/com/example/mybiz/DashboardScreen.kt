@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -44,8 +45,6 @@ import ir.ehsannarmani.compose_charts.models.HorizontalIndicatorProperties
 import ir.ehsannarmani.compose_charts.models.LabelHelperProperties
 import ir.ehsannarmani.compose_charts.models.Line
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
@@ -70,7 +69,7 @@ data class Expense (
 )
 
 /*TODO
-*  implement the Room database and saving user info to Firebase
+*  implement saving user info to Firebase
 *  Add a spinwheel while loading data from db
 */
 
@@ -83,16 +82,17 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel =
     val incomeDAO = db.IncomeDAO()
     val expenseDAO = db.ExpenseDAO()
 
-    val IncomeList = remember { mutableStateListOf<Income>() }
-    val ExpenseList = remember { mutableStateListOf<Expense>() }
+
+    val incomeList = remember { mutableStateListOf<Income>() }
+    val expenseList = remember { mutableStateListOf<Expense>() }
 
     LaunchedEffect(Unit)        //unit makes sure that this will only execute upon startup
     {
         withContext(Dispatchers.IO)
         {
             incomeDAO.getAllIncomes().collect { allIncomes ->       //collecting data from the flow basically
-                IncomeList.clear()
-                IncomeList.addAll(allIncomes)
+                incomeList.clear()
+                incomeList.addAll(allIncomes)
             }
         }
     }
@@ -102,13 +102,13 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel =
         withContext(Dispatchers.IO)
         {
             expenseDAO.getAllExpenses().collect { allExpenses ->
-                ExpenseList.clear()
-                ExpenseList.addAll(allExpenses)
+                expenseList.clear()
+                expenseList.addAll(allExpenses)
             }
         }
     }
 
-    var show_dialog by remember { mutableStateOf(false) }
+    var showDialog by remember { mutableStateOf(false) }
     var currentChartView by remember { mutableStateOf("Przychody") }
 
     Column(
@@ -127,7 +127,7 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel =
                 text = "Witaj, imię",
                 color = Color.White,
                 style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(10.dp)
+                modifier = Modifier.padding(20.dp)
             )
 
             TextButton(
@@ -136,11 +136,25 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel =
                     navController.navigate("main_screen")
                 }
             ) {
-                Text(
-                    text = "Wyloguj się",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = Color(47, 186, 63)
-                )
+
+                IconButton(
+                    onClick = {  },
+                    modifier = Modifier.width(50.dp).height(50.dp).padding(10.dp)
+                ){
+                    Icon(
+                        Icons.Default.AccountCircle,
+                        contentDescription = "User options",
+                        tint = Color(47, 186, 63),
+                        modifier = Modifier.width(50.dp).height(50.dp)
+                    )
+
+                }
+
+//                Text(         //Scrapping this for now
+//                    text = "Wyloguj się",
+//                    style = MaterialTheme.typography.bodyLarge,
+//                    color = Color(47, 186, 63)
+//                )
             }
         }
 
@@ -184,10 +198,10 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel =
                 )
             }
 
-            //expense/income button here
+            //expense/income button
             ElevatedButton(
                 onClick = {
-                    show_dialog = true
+                    showDialog = true
                 },
                 modifier = Modifier
                     .height(40.dp)
@@ -202,8 +216,8 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel =
 
         }
 
-        val incomeValues = IncomeList.map { it.amount }
-        val expenseValues = ExpenseList.map { it.amount }
+        val incomeValues = incomeList.map { it.amount }
+        val expenseValues = expenseList.map { it.amount }
 
         val hasData = when (currentChartView) {
             "Przychody" -> incomeValues.isNotEmpty()
@@ -223,7 +237,7 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel =
                     .background(Color(22, 22, 26)),
                 contentAlignment = Alignment.Center
             ){
-                Text(text = "Brak danych do pokazania :(", color = Color(47, 186, 63), fontWeight = FontWeight.Bold)
+                Text(text = "Brak danych do pokazania :( ", color = Color(47, 186, 63), fontWeight = FontWeight.Bold)
             }
         } else {
             LineChart(
@@ -287,12 +301,12 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel =
                 if((currentChartView == "Przychody" || currentChartView == "Wszystko") && incomeValues.isNotEmpty())
                 {
                     //showing income list
-                    items(IncomeList) { item -> //for every item in list:
+                    items(incomeList) { item -> //for every item in list:
                         Box(
                             modifier = Modifier
                                 .padding(top=4.dp)
                                 .width(340.dp)
-                                .height(30.dp)
+                                .height(50.dp)
                                 .clip(RoundedCornerShape(12.dp))
                                 .background(Color(36, 36, 36)),
                             contentAlignment = Alignment.Center
@@ -328,12 +342,12 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel =
                 if((currentChartView == "Wydatki" || currentChartView == "Wszystko") && expenseValues.isNotEmpty())
                 {
                     //showing expense items
-                    items(ExpenseList) { item -> //for every item in list:
+                    items(expenseList) { item -> //for every item in list:
                         Box(
                             modifier = Modifier
                                 .padding(top=4.dp)
                                 .width(340.dp)
-                                .height(30.dp)
+                                .height(50.dp)
                                 .clip(RoundedCornerShape(12.dp))
                                 .background(Color(36, 36, 36)),
                             contentAlignment = Alignment.Center
@@ -372,9 +386,9 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel =
         }
 
         //Operation dialog window handling
-        if(show_dialog)
+        if(showDialog)
         {
-            OperationDialog(onDismissRequest = {show_dialog = false}, IncomeList = IncomeList,ExpenseList =  ExpenseList, incomeDAO = incomeDAO, expenseDAO = expenseDAO)
+            OperationDialog(onDismissRequest = {showDialog = false}, incomes = incomeList,expenses =  expenseList, incomeDAO = incomeDAO, expenseDAO = expenseDAO)
         }
 
     }
@@ -384,8 +398,8 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel =
 @Composable
 fun OperationDialog(
     onDismissRequest: () -> Unit,
-    IncomeList: MutableList<Income>,
-    ExpenseList: MutableList<Expense>,
+    incomes: MutableList<Income>,
+    expenses: MutableList<Expense>,
     incomeDAO: IncomeDAO,
     expenseDAO: ExpenseDAO
 ) {
@@ -393,12 +407,12 @@ fun OperationDialog(
     val coroutineScope = rememberCoroutineScope()
 
 
-    var title_input by remember { mutableStateOf("") }
-    var amount_input by remember { mutableStateOf("") }
-    var is_income by remember { mutableStateOf(false) }
-    var date_input by remember { mutableStateOf(LocalDate.now()) }
+    var titleInput by remember { mutableStateOf("") }
+    var amountInput by remember { mutableStateOf("") }
+    var isIncome by remember { mutableStateOf(false) }
+    var dateInput by remember { mutableStateOf(LocalDate.now()) }
 
-    val amount_regex =Regex("^[+]?([0-9]+(?:[\\.][0-9]{0,2})?|\\.[0-9]{0,2})$")
+    val amountRegex =Regex("^[+]?([0-9]+(?:[.][0-9]{0,2})?|\\.[0-9]{0,2})$")
 
     val context = LocalContext.current
 
@@ -422,13 +436,13 @@ fun OperationDialog(
             ) {
 
                 OutlinedTextField(  //operation title input field
-                    value = title_input,
+                    value = titleInput,
                     onValueChange = { newValue ->
                         if (newValue.isNotEmpty()) {
-                            title_input = newValue
+                            titleInput = newValue
                             return@OutlinedTextField
                         }
-                        title_input = newValue
+                        titleInput = newValue
                     },
                     shape = RoundedCornerShape(15.dp),
                     label = { Text("Tytuł Operacji:") },
@@ -440,16 +454,16 @@ fun OperationDialog(
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     OutlinedTextField(  //operation title input field
-                        value = amount_input,
+                        value = amountInput,
                         onValueChange = { newValue ->
                             if (newValue.isEmpty())
                             {
-                                amount_input = newValue
+                                amountInput = newValue
                                 return@OutlinedTextField
                             }
-                            if(newValue.matches(amount_regex))
+                            if(newValue.matches(amountRegex))
                             {
-                                amount_input = newValue
+                                amountInput = newValue
                             }
                         },
                         shape = RoundedCornerShape(15.dp),
@@ -474,9 +488,9 @@ fun OperationDialog(
                     horizontalArrangement = Arrangement.spacedBy(5.dp)
                 ) {
                     Checkbox(
-                        checked = is_income,
+                        checked = isIncome,
                         onCheckedChange = { isChecked ->
-                            is_income = isChecked
+                            isIncome = isChecked
                         }
                     )
 
@@ -487,7 +501,7 @@ fun OperationDialog(
                     )
                 }
 
-                DatePickerField("Data operacji", date_input, onDateSelected = {date_input = it}) //operation date field
+                DatePickerField("Data operacji", dateInput, onDateSelected = {dateInput = it}) //operation date field
 
                 Row( //dialog buttons row
                     modifier = Modifier.fillMaxWidth(),
@@ -505,13 +519,13 @@ fun OperationDialog(
 
                     TextButton( //accept button
                         onClick = {
-                            if(!title_input.isEmpty() && !amount_input.isEmpty())
+                            if(!titleInput.isEmpty() && !amountInput.isEmpty())
                             {
 
-                                if(is_income)
+                                if(isIncome)
                                 {
-                                    val newIncome = Income(amount = amount_input.toDouble(), name = title_input, date = date_input)
-                                    IncomeList.add(newIncome)
+                                    val newIncome = Income(amount = amountInput.toDouble(), name = titleInput, date = dateInput)
+                                    incomes.add(newIncome)
 
                                     coroutineScope.launch(Dispatchers.IO)
                                     {
@@ -520,8 +534,8 @@ fun OperationDialog(
                                     Toast.makeText(context, "Przychód dodany pomyślnie!", Toast.LENGTH_SHORT).show()
 
                                 } else {
-                                    val newExpense = Expense(amount = amount_input.toDouble(), name = title_input, date = date_input)
-                                    ExpenseList.add(newExpense)
+                                    val newExpense = Expense(amount = amountInput.toDouble(), name = titleInput, date = dateInput)
+                                    expenses.add(newExpense)
 
                                     coroutineScope.launch(Dispatchers.IO)
                                     {
@@ -590,6 +604,7 @@ fun DatePickerField(
         }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable

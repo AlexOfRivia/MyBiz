@@ -42,6 +42,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.compose.foundation)
     val nav_version = "2.9.7"
     val roomVersion = "2.8.4"
 

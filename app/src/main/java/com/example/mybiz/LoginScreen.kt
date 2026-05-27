@@ -27,7 +27,7 @@ fun LoginScreen(navController: NavController)
     val context = androidx.compose.ui.platform.LocalContext.current
 
     //initializing Firebase
-    var auth = if(androidx.compose.ui.platform.LocalInspectionMode.current) {
+    val auth = if(androidx.compose.ui.platform.LocalInspectionMode.current) {
         null
     } else {
         Firebase.auth
