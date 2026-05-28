@@ -9,6 +9,8 @@ class AuthViewModel : ViewModel()
 {
     private val auth = Firebase.auth
 
+    //user username from Firebase db based on email
+
     var isUserLoggedIn = mutableStateOf(auth.currentUser != null)
         private set
 
@@ -17,4 +19,6 @@ class AuthViewModel : ViewModel()
         auth.signOut()
         isUserLoggedIn.value = false
     }
+
+
 }

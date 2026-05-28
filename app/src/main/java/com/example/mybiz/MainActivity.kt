@@ -24,7 +24,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    var authViewModel: AuthViewModel = viewModel()
+                    val authViewModel: AuthViewModel = viewModel()
                     val navigationController = rememberNavController()
                     val startScreen = if(authViewModel.isUserLoggedIn.value) "dashboard_screen" else "main_screen"
 
@@ -47,6 +47,9 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("password_reset_screen") {
                             PasswordResetScreen(navigationController)
+                        }
+                        composable("user_info_screen") {
+                            UserInfoScreen(navigationController, authViewModel)
                         }
                     }
                 }

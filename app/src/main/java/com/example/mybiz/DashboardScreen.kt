@@ -148,9 +148,9 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel =
                     "Akcje użytkownika",
                     modifier = Modifier.padding(16.dp),
                     style = MaterialTheme.typography.headlineLarge,
-                    color = Color(47, 186, 63)
+                    color = Color(47,186,63)
                 )
-                HorizontalDivider(modifier = Modifier.padding(bottom = 20.dp))
+                HorizontalDivider(modifier = Modifier.padding(bottom = 80.dp))
 
                 NavigationDrawerItem(
                     label = {
@@ -162,12 +162,13 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel =
                     selected = false,
                     onClick = {
                         /*przkierowanie do karty z edytowaniem danych konta typu: username, haslo, usuniecie konta, itp itp*/
+                        navController.navigate("user_info_screen")
                     }
                 )
 
                 HorizontalDivider(
                     color = Color.Transparent,
-                    modifier = Modifier.padding(50.dp)
+                    modifier = Modifier.padding(150.dp)
                 )
 
                 NavigationDrawerItem(

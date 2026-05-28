@@ -27,8 +27,7 @@ fun RegisterScreen(navController: NavController)
     val context = androidx.compose.ui.platform.LocalContext.current
 
     //initializing Firebase
-    var auth = remember { Firebase.auth }
-    auth = Firebase.auth
+    val auth = Firebase.auth
     
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -85,6 +84,14 @@ fun RegisterScreen(navController: NavController)
                         }
                     }
                 }
+
+                //save username to firebase db
+
+
+
+
+
+
             },
             modifier = Modifier.width(200.dp).padding(bottom=50.dp, top = 50.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color(47, 186, 63))
