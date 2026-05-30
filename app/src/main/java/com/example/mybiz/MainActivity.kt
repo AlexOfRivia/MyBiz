@@ -37,7 +37,7 @@ class MainActivity : ComponentActivity() {
                             MainScreen(navigationController) //passing the navigation controller for managing views
                         }
                         composable("register_screen") {
-                            RegisterScreen(navigationController)
+                            RegisterScreen(navigationController, authViewModel)
                         }
                         composable("login_screen") {
                             LoginScreen(navigationController)

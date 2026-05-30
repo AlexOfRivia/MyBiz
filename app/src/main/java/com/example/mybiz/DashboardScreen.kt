@@ -64,6 +64,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.mybiz.ui.theme.MyBizTheme
+import com.google.firebase.database.FirebaseDatabase
 import ir.ehsannarmani.compose_charts.LineChart
 import ir.ehsannarmani.compose_charts.models.AnimationMode
 import ir.ehsannarmani.compose_charts.models.DrawStyle
@@ -72,6 +73,7 @@ import ir.ehsannarmani.compose_charts.models.LabelHelperProperties
 import ir.ehsannarmani.compose_charts.models.Line
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -102,6 +104,9 @@ data class Expense(
 @Composable
 fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel = viewModel()) {
     val context = LocalContext.current
+
+    val database = FirebaseDatabase.getInstance()
+    var username by remember { mutableStateOf("") }
 
     val db = AppDatabase.getDatabase(context)           //db related stuff
     val incomeDAO = db.IncomeDAO()
@@ -161,7 +166,6 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel =
                     ) },
                     selected = false,
                     onClick = {
-                        /*przkierowanie do karty z edytowaniem danych konta typu: username, haslo, usuniecie konta, itp itp*/
                         navController.navigate("user_info_screen")
                     }
                 )
@@ -188,6 +192,28 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel =
         }
     ) {
 
+        val userEmail = authViewModel.user?.email.toString()
+
+        LaunchedEffect(userEmail) {
+            if(userEmail.isNotEmpty())
+            {
+                try {
+                    val email = userEmail.replace(".","")
+
+                    val snapshot = database.getReference("Users")
+                        .child(email)
+                        .child("username")
+                        .get()
+                        .await()
+
+                    username = snapshot.getValue(String::class.java) ?: ""
+
+                } catch(e: Exception) {
+                    android.util.Log.e("FirebaseError", "Error while fetching database", e)
+                }
+            }
+        }
+
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -201,7 +227,7 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel =
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "Witaj, imię",
+                    text = "Witaj, $username",
                     color = Color.White,
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.padding(20.dp)

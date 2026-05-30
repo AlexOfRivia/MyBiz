@@ -43,6 +43,8 @@ android {
 
 dependencies {
     implementation(libs.androidx.compose.foundation)
+    implementation("com.google.firebase:firebase-database-ktx:21.0.0")
+    implementation(libs.firebase.database)
     val nav_version = "2.9.7"
     val roomVersion = "2.8.4"
 
