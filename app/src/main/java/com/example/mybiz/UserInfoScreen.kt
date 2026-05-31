@@ -37,9 +37,11 @@ import com.google.firebase.auth.auth
 @Composable
 fun UserInfoScreen(navController: NavController, authViewModel: AuthViewModel = viewModel()) {
 
-    var userUsername by remember { mutableStateOf("") }     //this will be fetched from firebase db soon
+    var newUsername by remember { mutableStateOf(authViewModel.username) }
     var oldUserPassword by remember { mutableStateOf("") }
     var newUserPassword by remember { mutableStateOf("") }
+
+    var showDialog by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
 
@@ -75,8 +77,10 @@ fun UserInfoScreen(navController: NavController, authViewModel: AuthViewModel = 
         }
 
         OutlinedTextField(      //username input
-            value = userUsername,
-            onValueChange = { userUsername = it },
+            value = newUsername,
+            onValueChange = { newValue ->
+                newUsername = newValue
+            },
             label = { Text("Nazwa użytkownika") },
             modifier = Modifier.padding(bottom = 40.dp),
             singleLine = true,
@@ -103,6 +107,22 @@ fun UserInfoScreen(navController: NavController, authViewModel: AuthViewModel = 
 
         ElevatedButton(                    //save changes button
             onClick = {
+                if(newUsername == authViewModel.username)
+                {
+                    Toast.makeText(context, "Nowa nazwa konta musi być inna od starej", Toast.LENGTH_LONG).show()
+                } else {
+                    if(newUsername.isNotEmpty())
+                    {
+                        authViewModel.updateUsername(newUsername)
+                        navController.navigate("dashboard_screen")
+                        Toast.makeText(context, "Nazwa użytkownika zmieniona pomyślnie!", Toast.LENGTH_LONG).show()
+                    } else {
+                        Toast.makeText(context, "Nazwa nie może być pusta!", Toast.LENGTH_LONG).show()
+                    }
+                }
+
+
+
                 if (oldUserPassword.isNotEmpty() && newUserPassword.isNotEmpty()) {
                     val credential = EmailAuthProvider.getCredential(user?.email!!, oldUserPassword)
                     if (oldUserPassword==(newUserPassword))
@@ -127,11 +147,6 @@ fun UserInfoScreen(navController: NavController, authViewModel: AuthViewModel = 
                             }
                     }
                 }
-
-                if (userUsername.isNotEmpty())
-                {
-                    //changing username
-                }
             },
             modifier = Modifier.padding(bottom = 150.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color(47, 186, 63))
@@ -146,7 +161,7 @@ fun UserInfoScreen(navController: NavController, authViewModel: AuthViewModel = 
 
         //Delete account button with "We're sad to see you go. are you sure you want to?" dialog
         TextButton(
-            onClick = { /*open dialog*/ }
+            onClick = { showDialog = true }
         ) {
             Text(
                 text = "Usuń konto",
@@ -155,6 +170,17 @@ fun UserInfoScreen(navController: NavController, authViewModel: AuthViewModel = 
             )
         }
     }
+
+    if (showDialog)
+    {
+        DeleteUserDialog(onDismissRequest = { showDialog = false })
+    }
+}
+
+@Composable
+fun DeleteUserDialog(onDismissRequest: () -> Unit)
+{
+    //NOTES: after clicking the OK button -> delete account + navigate to main screen
 }
 
 @Preview

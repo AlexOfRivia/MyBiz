@@ -64,7 +64,6 @@ import androidx.navigation.compose.rememberNavController
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.mybiz.ui.theme.MyBizTheme
-import com.google.firebase.database.FirebaseDatabase
 import ir.ehsannarmani.compose_charts.LineChart
 import ir.ehsannarmani.compose_charts.models.AnimationMode
 import ir.ehsannarmani.compose_charts.models.DrawStyle
@@ -73,7 +72,6 @@ import ir.ehsannarmani.compose_charts.models.LabelHelperProperties
 import ir.ehsannarmani.compose_charts.models.Line
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -97,7 +95,6 @@ data class Expense(
 )
 
 /*TODO
-*  implement saving user info to Firebase
 *  Add a spinwheel while loading data from db
 */
 
@@ -105,13 +102,11 @@ data class Expense(
 fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel = viewModel()) {
     val context = LocalContext.current
 
-    val database = FirebaseDatabase.getInstance()
-    var username by remember { mutableStateOf("") }
-
     val db = AppDatabase.getDatabase(context)           //db related stuff
     val incomeDAO = db.IncomeDAO()
     val expenseDAO = db.ExpenseDAO()
 
+    val username = authViewModel.username
 
     val incomeList = remember { mutableStateListOf<Income>() }
     val expenseList = remember { mutableStateListOf<Expense>() }
@@ -191,29 +186,6 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel =
             }
         }
     ) {
-
-        val userEmail = authViewModel.user?.email.toString()
-
-        LaunchedEffect(userEmail) {
-            if(userEmail.isNotEmpty())
-            {
-                try {
-                    val email = userEmail.replace(".","")
-
-                    val snapshot = database.getReference("Users")
-                        .child(email)
-                        .child("username")
-                        .get()
-                        .await()
-
-                    username = snapshot.getValue(String::class.java) ?: ""
-
-                } catch(e: Exception) {
-                    android.util.Log.e("FirebaseError", "Error while fetching database", e)
-                }
-            }
-        }
-
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,

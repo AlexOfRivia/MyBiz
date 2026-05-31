@@ -91,6 +91,7 @@ fun RegisterScreen(navController: NavController, authViewModel: AuthViewModel = 
                             )
                             userRef.setValue(userData).addOnSuccessListener {
                                 Toast.makeText(context, "Zarejestrowanie przebiegło pomyślnie", Toast.LENGTH_SHORT).show()
+                                authViewModel.username = username
                             }
                             navController.navigate("dashboard_screen")
                         } else {
