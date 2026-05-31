@@ -63,7 +63,7 @@ class AuthViewModel : ViewModel()
 
                    user!!.delete().await()
                     isUserLoggedIn.value = false
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                     Log.e("Firebase delete", "Error while deleting")
                 }
 

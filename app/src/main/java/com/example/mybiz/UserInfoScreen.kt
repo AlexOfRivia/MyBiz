@@ -162,8 +162,6 @@ fun UserInfoScreen(navController: NavController, authViewModel: AuthViewModel = 
             )
         }
 
-
-        //Delete account button with "We're sad to see you go. are you sure you want to?" dialog
         TextButton(
             onClick = { showDialog = true }
         ) {
@@ -177,7 +175,7 @@ fun UserInfoScreen(navController: NavController, authViewModel: AuthViewModel = 
 
     if (showDialog)
     {
-        DeleteUserDialog(onDismissRequest = { showDialog = false }, authViewModel, navController)
+        DeleteUserDialog(onDismissRequest = {showDialog = false} , authViewModel, navController)
     }
 }
 
@@ -187,7 +185,6 @@ fun DeleteUserDialog(
     authViewModel: AuthViewModel = viewModel(),
     navController: NavController
 ) {
-    //NOTES: after clicking the OK button -> delete account + navigate to main screen
     Dialog(
         onDismissRequest = { onDismissRequest() }
     ) {
@@ -195,7 +192,7 @@ fun DeleteUserDialog(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(250.dp)
-                .width(400.dp)
+                .width(425.dp)
                 .padding(15.dp),
             shape = RoundedCornerShape(15.dp)
         ) {

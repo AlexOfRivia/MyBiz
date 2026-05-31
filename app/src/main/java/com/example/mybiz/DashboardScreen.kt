@@ -94,6 +94,10 @@ data class Expense(
     var date: LocalDate
 )
 
+
+/*TODO
+*  ADD DELETING/EDITING TRANSACTIONS UPON CLICKING*/
+
 @Composable
 fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel = viewModel()) {
     val context = LocalContext.current
