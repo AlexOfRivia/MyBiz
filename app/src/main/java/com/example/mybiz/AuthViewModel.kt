@@ -60,14 +60,16 @@ class AuthViewModel : ViewModel()
                         .child(email)
                         .removeValue()
                         .await()
+
+                   user!!.delete().await()
+                    isUserLoggedIn.value = false
                 } catch (e: Exception) {
                     Log.e("Firebase delete", "Error while deleting")
                 }
 
             }
         }
-        user?.delete()
-        isUserLoggedIn.value = false
+
     }
 
     private fun fetchUsername()

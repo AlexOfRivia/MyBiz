@@ -94,10 +94,6 @@ data class Expense(
     var date: LocalDate
 )
 
-/*TODO
-*  Add a spinwheel while loading data from db
-*/
-
 @Composable
 fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel = viewModel()) {
     val context = LocalContext.current
@@ -605,7 +601,8 @@ fun OperationDialog(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     TextButton( //dismiss button
-                        onClick = { onDismissRequest() }
+                        onClick = { onDismissRequest() },
+                        modifier = Modifier.padding(10.dp)
                     ) {
                         Text(
                             text = "Anuluj",
@@ -658,7 +655,8 @@ fun OperationDialog(
                                     Toast.LENGTH_LONG
                                 ).show()
                             }
-                        }
+                        },
+                        modifier = Modifier.padding(10.dp)
 
                     ) {
                         Text(

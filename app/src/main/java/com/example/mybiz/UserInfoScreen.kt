@@ -6,11 +6,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
 import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -26,6 +29,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -173,14 +177,74 @@ fun UserInfoScreen(navController: NavController, authViewModel: AuthViewModel = 
 
     if (showDialog)
     {
-        DeleteUserDialog(onDismissRequest = { showDialog = false })
+        DeleteUserDialog(onDismissRequest = { showDialog = false }, authViewModel, navController)
     }
 }
 
 @Composable
-fun DeleteUserDialog(onDismissRequest: () -> Unit)
-{
+fun DeleteUserDialog(
+    onDismissRequest: () -> Unit,
+    authViewModel: AuthViewModel = viewModel(),
+    navController: NavController
+) {
     //NOTES: after clicking the OK button -> delete account + navigate to main screen
+    Dialog(
+        onDismissRequest = { onDismissRequest() }
+    ) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(250.dp)
+                .width(400.dp)
+                .padding(15.dp),
+            shape = RoundedCornerShape(15.dp)
+        ) {
+
+            Column(         //main column
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                //confirmation text
+                Text(
+                    text = "Przykro nam, że odchodzisz. Czy na pewno chcesz usunąć konto?",
+                    color = Color.White,
+                    modifier = Modifier.padding(20.dp),
+                    style = MaterialTheme.typography.bodyLarge
+                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ){
+                    TextButton(         //dismiss button
+                        onClick = { onDismissRequest() },
+                        modifier = Modifier.padding(10.dp)
+                    ) {
+                        Text(
+                            text = "Anuluj",
+                            fontWeight = FontWeight.Bold,
+                            color = Color(47, 186, 63)
+                        )
+                    }
+                    TextButton(          //accept button
+                        onClick = {
+                            authViewModel.deleteUser()
+                            navController.navigate("main_screen")
+                        },
+                        modifier = Modifier.padding(10.dp)
+                    ) {
+                        Text(
+                            text = "OK",
+                            fontWeight = FontWeight.Bold,
+                            color = Color(47, 186, 63)
+                        )
+                    }
+                }
+
+            }
+        }
+    }
 }
 
 @Preview
