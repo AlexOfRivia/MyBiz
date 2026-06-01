@@ -109,7 +109,7 @@ fun UserInfoScreen(navController: NavController, authViewModel: AuthViewModel = 
             shape = RoundedCornerShape(12.dp)
         )
 
-        ElevatedButton(                    //save changes button
+        ElevatedButton(          //save changes button
             onClick = {
                 if(newUsername == authViewModel.username)
                 {

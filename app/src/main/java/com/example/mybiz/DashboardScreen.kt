@@ -5,6 +5,7 @@ import android.widget.Toast
 import androidx.compose.animation.core.EaseInOutCubic
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,11 +15,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -94,10 +97,6 @@ data class Expense(
     var date: LocalDate
 )
 
-
-/*TODO
-*  ADD DELETING/EDITING TRANSACTIONS UPON CLICKING*/
-
 @Composable
 fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel = viewModel()) {
     val context = LocalContext.current
@@ -136,6 +135,8 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel =
 
     var showDialog by remember { mutableStateOf(false) }
     var currentChartView by remember { mutableStateOf("Przychody") }
+
+    val coroutineScope = rememberCoroutineScope()
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -368,6 +369,8 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel =
                 )
             }
 
+            var expandedItem by remember { mutableStateOf<Any?>(null) }
+
             Box(
                 modifier = Modifier
                     .width(350.dp)
@@ -382,47 +385,85 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel =
                         .fillMaxSize()
                         .clip(RoundedCornerShape(12.dp)),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    //verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     //checking for currently selected view option
                     if ((currentChartView == "Przychody" || currentChartView == "Wszystko") && incomeValues.isNotEmpty()) {
                         //showing income list
                         items(incomeList) { item -> //for every item in list:
+                            val isExpanded = expandedItem === item
+
                             Box(
                                 modifier = Modifier
                                     .padding(top = 4.dp)
                                     .width(340.dp)
-                                    .height(50.dp)
+                                    .wrapContentHeight()
                                     .clip(RoundedCornerShape(12.dp))
-                                    .background(Color(36, 36, 36)),
+                                    .background(Color(36, 36, 36))
+                                    .clickable { expandedItem = if (isExpanded) null else item },
                                 contentAlignment = Alignment.Center
                             ) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(5.dp),
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    Text(
-                                        text = item.name,
-                                        color = Color.White,
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        modifier = Modifier.weight(0.4f)
-                                    )
+                                Column(modifier = Modifier.padding(5.dp)) {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(40.dp)
+                                            .padding(5.dp),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = item.name,
+                                            color = Color.White,
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            modifier = Modifier.weight(0.4f)
+                                        )
 
-                                    Text(
-                                        text = item.date.toString(),
-                                        color = Color.White,
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        modifier = Modifier.weight(0.2f)
-                                    )
+                                        Text(
+                                            text = item.date.toString(),
+                                            color = Color.White,
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            modifier = Modifier.weight(0.2f)
+                                        )
 
-                                    Text(
-                                        text = (item.amount.toString() + "PLN"),
-                                        color = Color.White,
-                                        fontWeight = FontWeight.Bold,
-                                        modifier = Modifier.weight(0.2f)
-                                    )
+                                        Text(
+                                            text = (item.amount.toString() + "PLN"),
+                                            color = Color.White,
+                                            fontWeight = FontWeight.Bold,
+                                            modifier = Modifier.weight(0.2f)
+                                        )
+                                    }
+
+                                    if (isExpanded) {
+                                        HorizontalDivider(color = Color(50, 50, 50), modifier = Modifier.padding(vertical = 4.dp))
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth().padding(horizontal = 5.dp, vertical = 4.dp),
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Text(
+                                                text = "szczegóły: ${item.name}",
+                                                color = Color.Gray,
+                                                style = MaterialTheme.typography.bodySmall
+                                            )
+
+                                            IconButton(
+                                                onClick = {
+                                                    expandedItem = null
+                                                    coroutineScope.launch(Dispatchers.IO)
+                                                    {
+                                                        incomeDAO.delete(item)
+                                                    }
+
+                                                }
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.Default.Delete,
+                                                    contentDescription = "Usuń",
+                                                    tint = Color.Red
+                                                )
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -430,47 +471,84 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel =
                     if ((currentChartView == "Wydatki" || currentChartView == "Wszystko") && expenseValues.isNotEmpty()) {
                         //showing expense items
                         items(expenseList) { item -> //for every item in list:
+                            val isExpanded = expandedItem === item
+
                             Box(
                                 modifier = Modifier
                                     .padding(top = 4.dp)
                                     .width(340.dp)
-                                    .height(50.dp)
+                                    .wrapContentHeight()
                                     .clip(RoundedCornerShape(12.dp))
-                                    .background(Color(36, 36, 36)),
+                                    .background(Color(36, 36, 36))
+                                    .clickable { expandedItem = if (isExpanded) null else item },
                                 contentAlignment = Alignment.Center
                             ) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(5.dp),
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    Text(
-                                        text = item.name,
-                                        color = Color.White,
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        modifier = Modifier.weight(0.4f)
-                                    )
+                                Column(modifier = Modifier.padding(5.dp)) {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(40.dp)
+                                            .padding(5.dp),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = item.name,
+                                            color = Color.White,
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            modifier = Modifier.weight(0.4f)
+                                        )
 
-                                    Text(
-                                        text = item.date.toString(),
-                                        color = Color.White,
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        modifier = Modifier.weight(0.2f)
-                                    )
+                                        Text(
+                                            text = item.date.toString(),
+                                            color = Color.White,
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            modifier = Modifier.weight(0.2f)
+                                        )
 
-                                    Text(
-                                        text = "-" + (item.amount.toString() + "PLN"),
-                                        color = Color.White,
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        fontWeight = FontWeight.Bold,
-                                        modifier = Modifier.weight(0.2f)
-                                    )
+                                        Text(
+                                            text = "-" + (item.amount.toString() + "PLN"),
+                                            color = Color.White,
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            fontWeight = FontWeight.Bold,
+                                            modifier = Modifier.weight(0.2f)
+                                        )
+                                    }
+
+                                    if (isExpanded) {
+                                        HorizontalDivider(color = Color(50, 50, 50), modifier = Modifier.padding(vertical = 4.dp))
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth().padding(horizontal = 5.dp, vertical = 4.dp),
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Text(
+                                                text = "Szczegóły: ${item.name}",
+                                                color = Color.Gray,
+                                                style = MaterialTheme.typography.bodySmall
+                                            )
+
+                                            IconButton(
+                                                onClick = {
+                                                    expandedItem = null
+                                                    coroutineScope.launch(Dispatchers.IO)
+                                                    {
+                                                        expenseDAO.delete(item)
+                                                    }
+                                                }
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.Default.Delete,
+                                                    contentDescription = "Usuń",
+                                                    tint = Color.Red
+                                                )
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
-
                 }
             }
 
@@ -631,11 +709,7 @@ fun OperationDialog(
                                     {
                                         incomeDAO.insert(newIncome)
                                     }
-                                    Toast.makeText(
-                                        context,
-                                        "Przychód dodany pomyślnie!",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
+                                    Toast.makeText(context, "Przychód dodany pomyślnie!", Toast.LENGTH_SHORT).show()
 
                                 } else {
                                     val newExpense = Expense(
@@ -649,7 +723,7 @@ fun OperationDialog(
                                     {
                                         expenseDAO.insert(newExpense)
                                     }
-                                    //Toast.makeText(context, "Wydatek dodany pomyślnie!", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, "Wydatek dodany pomyślnie!", Toast.LENGTH_SHORT).show()
                                 }
                                 onDismissRequest()
                             } else {
