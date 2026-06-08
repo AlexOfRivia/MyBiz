@@ -1,5 +1,6 @@
 package com.example.mybiz
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -7,17 +8,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.mybiz.ui.theme.MyBizTheme
 import com.google.firebase.Firebase
-import com.google.firebase.FirebaseApp.*
 import com.google.firebase.auth.*
-
+import com.google.firebase.database.FirebaseDatabase
 @Composable
-fun RegisterScreen(navController: NavController)
+fun RegisterScreen(navController: NavController, authViewModel: AuthViewModel = viewModel())
 {
     var username by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
@@ -26,8 +29,7 @@ fun RegisterScreen(navController: NavController)
     val context = androidx.compose.ui.platform.LocalContext.current
 
     //initializing Firebase
-    var auth = remember { Firebase.auth }
-    auth = Firebase.auth
+    val auth = Firebase.auth
     
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -36,7 +38,7 @@ fun RegisterScreen(navController: NavController)
     ) {
         Text(
             text = "Zarejestruj się",
-            color = MaterialTheme.colorScheme.primary,
+            color = Color(47, 186, 63),
             style = MaterialTheme.typography.headlineLarge,
             modifier = Modifier.padding(top = 70.dp, bottom = 150.dp)
         )
@@ -71,23 +73,41 @@ fun RegisterScreen(navController: NavController)
             shape = RoundedCornerShape(12.dp)
         )
 
-        Button(
+        ElevatedButton(
             onClick = {
                 if(password.isNotEmpty() && email.isNotEmpty())
                 {
                     auth.createUserWithEmailAndPassword(email,password).addOnCompleteListener { task ->
                         if (task.isSuccessful)
                         {
+                            val database = FirebaseDatabase.getInstance()
+
+                            val safeEmail = email.replace(".","")
+
+                            val userRef = database.getReference("Users").child(safeEmail)
+
+                            val userData = mapOf(
+                                "username" to username
+                            )
+                            userRef.setValue(userData).addOnSuccessListener {
+                                Toast.makeText(context, "Zarejestrowanie przebiegło pomyślnie", Toast.LENGTH_SHORT).show()
+                                authViewModel.username = username
+                            }
                             navController.navigate("dashboard_screen")
                         } else {
-                            android.widget.Toast.makeText(context, "Error: ${task.exception?.message}",android.widget.Toast.LENGTH_LONG).show()
+                            Toast.makeText(context, "Error: ${task.exception?.message}",Toast.LENGTH_LONG).show()
                         }
                     }
                 }
             },
-            modifier = Modifier.width(200.dp).padding(bottom=50.dp, top = 50.dp)
+            modifier = Modifier.width(200.dp).padding(bottom=50.dp, top = 50.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(47, 186, 63))
         ) {
-            Text("Dalej")
+            Text(
+                text = "Dalej",
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+            )
         }
 
     }

@@ -6,6 +6,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -25,23 +27,33 @@ fun MainScreen(navController: NavController)
     ) {
         Text(
             text = "MyBiz",
-            color = MaterialTheme.colorScheme.primary,
+            color = Color(47, 186, 63),
             style = MaterialTheme.typography.headlineLarge,
             modifier = Modifier.padding(top = 90.dp, bottom = 200.dp)
         )
 
         Button(
             onClick = { navController.navigate("login_screen") },
-            modifier = Modifier.fillMaxWidth().padding(40.dp)
+            modifier = Modifier.fillMaxWidth().padding(40.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(47, 186, 63))
         ) {
-            Text("Zaloguj się")
+            Text(
+                text = "Zaloguj się",
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+            )
         }
 
         Button(
             onClick = { navController.navigate("register_screen") },
-            modifier = Modifier.fillMaxWidth().padding(40.dp)
+            modifier = Modifier.fillMaxWidth().padding(40.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(47, 186, 63))
         ) {
-            Text("Zarejestruj się")
+            Text(
+                text = "Zarejestruj się",
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+            )
         }
 
     }

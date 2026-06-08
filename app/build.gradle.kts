@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.gms.google.services)
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -41,9 +42,23 @@ android {
 }
 
 dependencies {
-    implementation(libs.firebase.auth)
+    implementation(libs.androidx.compose.foundation)
+    implementation("com.google.firebase:firebase-database-ktx:21.0.0")
+    implementation(libs.firebase.database)
     val nav_version = "2.9.7"
+    val roomVersion = "2.8.4"
+
+    implementation(libs.firebase.auth)
+    implementation(libs.androidx.compose.ui.text)
     implementation("androidx.navigation:navigation-compose:${nav_version}")
+    implementation ("io.github.ehsannarmani:compose-charts:0.2.5")
+
+
+    implementation("androidx.room:room-runtime:$roomVersion")
+    ksp("androidx.room:room-compiler:$roomVersion")
+    implementation("androidx.room:room-ktx:$roomVersion")
+    implementation("androidx.room:room-paging:$roomVersion")
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

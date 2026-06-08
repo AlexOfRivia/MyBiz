@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
@@ -12,9 +13,6 @@ import androidx.navigation.compose.rememberNavController
 import com.example.mybiz.ui.theme.MyBizTheme
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.google.firebase.Firebase
-import com.google.firebase.FirebaseApp.*
-import com.google.firebase.auth.*
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,24 +24,32 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
+                    val authViewModel: AuthViewModel = viewModel()
                     val navigationController = rememberNavController()
+                    val startScreen = if(authViewModel.isUserLoggedIn.value) "dashboard_screen" else "main_screen"
 
                     NavHost(
                         navController = navigationController,
-                        startDestination = "main_screen"
-                    ) {
-                        //this it the route of all nav screens
+                        startDestination = startScreen
+                    ){
+                        //this is the route of all nav screens
                         composable("main_screen") {
                             MainScreen(navigationController) //passing the navigation controller for managing views
                         }
                         composable("register_screen") {
-                            RegisterScreen(navigationController) //passing the navigation controller for managing views
+                            RegisterScreen(navigationController, authViewModel)
                         }
                         composable("login_screen") {
-                            LoginScreen(navigationController) //passing the navigation controller for managing views
+                            LoginScreen(navigationController)
                         }
                         composable("dashboard_screen") {
-                            DashboardScreen(navigationController)
+                            DashboardScreen(navigationController, authViewModel)
+                        }
+                        composable("password_reset_screen") {
+                            PasswordResetScreen(navigationController)
+                        }
+                        composable("user_info_screen") {
+                            UserInfoScreen(navigationController, authViewModel)
                         }
                     }
                 }
