@@ -428,6 +428,7 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel =
                                         Text(
                                             text = (item.amount.toString() + "PLN"),
                                             color = Color.White,
+                                            style = MaterialTheme.typography.bodyMedium,
                                             fontWeight = FontWeight.Bold,
                                             modifier = Modifier.weight(0.2f)
                                         )
